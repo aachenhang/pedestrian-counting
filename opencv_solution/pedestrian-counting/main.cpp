@@ -40,36 +40,49 @@ namespace {
 		char filename[200];
 		string window_name = "video | q or esc to quit";
 		cout << "press space to save a picture. q or esc to quit" << endl;
-		namedWindow(window_name, WINDOW_KEEPRATIO); //resizable window;
+		//namedWindow(window_name, WINDOW_KEEPRATIO); //resizable window;
 		Mat frame;
 		
-		capture >> frame;
-		cout << frame.size() << endl;
+		/*capture >> frame;
+		cout << "size: " << frame.size() << endl;
+		cout << "channels: " << frame.channels() << endl;
+		cout << "depth: " << frame.depth() << endl;
+		cout << "elemSize: " << frame.elemSize() << endl;
+		cout << "elemSize1: " << frame.elemSize1() << endl;
+		cout << "total: " << frame.total() << endl;
+		cout << "type: " << frame.type() << endl;
+		cout << frame.row(0).size() << endl;
+		cout << frame.row(0) << endl;
+*/
+		int i = 0;
+		double t = (double)getTickCount();
+		for (;;) {
+			capture >> frame;
+			printf("%d\n", i++);
+			if (frame.empty())
+				break;
 
-		//for (;;) {
-		//	capture >> frame;
-		//	cout << frame << endl;
-		//	if (frame.empty())
-		//		break;
+			//imshow(window_name, frame);
+			//char key = (char)waitKey(30); //delay N millis, usually long enough to display and capture input
 
-		//	imshow(window_name, frame);
-		//	char key = (char)waitKey(30); //delay N millis, usually long enough to display and capture input
+			//switch (key) {
+			//case 'q':
+			//case 'Q':
+			//case 27: //escape key
+			//	return 0;
+			//case ' ': //Save an image
+			//	sprintf(filename, "filename%.3d.jpg", n++);
+			//	imwrite(filename, frame);
+			//	cout << "Saved " << filename << endl;
+			//	break;
+			//default:
+			//	cout << "Default " << filename << endl;
+			//	break;
+			//}
+		}
 
-		//	switch (key) {
-		//	case 'q':
-		//	case 'Q':
-		//	case 27: //escape key
-		//		return 0;
-		//	case ' ': //Save an image
-		//		sprintf(filename, "filename%.3d.jpg", n++);
-		//		imwrite(filename, frame);
-		//		cout << "Saved " << filename << endl;
-		//		break;
-		//	default:
-		//		cout << "Default " << filename << endl;
-		//		break;
-		//	}
-		//}
+		t = ((double)getTickCount() - t) / getTickFrequency();
+		cout << "Times passed in seconds: " << t << endl;//265.83s-33800frames
 		return 0;
 	}
 }
@@ -89,12 +102,10 @@ int main(int ac, char** av) {
 		return 1;
 	}
 	VideoCapture capture(arg); //try to open string, this will attempt to open it as a video file or image sequence
-	if (!capture.isOpened()) //if this fails, try to open as a video camera, through the use of an integer param
-		capture.open(atoi(arg.c_str()));
-	/*if (!capture.isOpened()) {
+	if (!capture.isOpened()) {
 		cerr << "Failed to open the video device, video file or image sequence!\n" << endl;
 		help(av);
 		return 1;
-	}*/
+	}
 	return process(capture);
 }
