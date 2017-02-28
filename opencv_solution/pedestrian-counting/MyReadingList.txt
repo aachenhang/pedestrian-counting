@@ -1,0 +1,17 @@
+//2017.2.27
+Understanding and Diagnosing Visual Tracking Systems
+KeyPoints:
+	public dataset: VTB1.0  PTB  ALOV++  VOT2014  VTB2014  VTB2.0  NUS-PRO
+	Feature Extractor: HOG + Raw Color
+	Observation Model: Structured Output SVM
+
+
+//2017.2.28
+Crowd Counting Estimation in Video Surveillance Based on Linear Regression Function 
+KeyPoints:
+	Existing alogotithms can be divided into quantitative statistics methods and qualitative estimation methods.
+	Pixel-based method faces the difficulty of foreground extraction and perspectrive distortion.
+	Light Effect Suppression Model(LESM) is used to extract the foreground, which combines MLBS and MFDM.
+	Oriented Inner Edges(OIEs) is applied to indicate the occlusion area.
+	A new method of perspective normalization is applied to furthest reduce the impact of perspective distortion.
+
