@@ -15,6 +15,13 @@
 //#include <libvibe++/ViBe.h>
 //#include <libvibe++/distances/Manhattan.h>
 #include <stdint.h>
+#include <mat.h>
+#include <string>
+
+const int maxofpoint = 10000;
+
+using namespace std;
+using namespace cv;
 
 class myclass {
 public:
@@ -27,5 +34,32 @@ static __inline void mytest() {
 	return;
 }
 
+void inline plotdemo() {
+	const char *matfilename = "F:/Downloads/Compressed/UCFCrowdCountingDataset_CVPR13/UCF_CC_50/44_ann.mat";
+	const char *imgfilename = "F:/Downloads/Compressed/UCFCrowdCountingDataset_CVPR13/UCF_CC_50/44.jpg";
+	MATFile* matfile = matOpen(matfilename, "r");
+	mxArray *mxarr = matGetVariable(matfile, "annPoints");
+
+	const size_t numofpoint = mxGetNumberOfElements(mxarr) / 2;
+
+
+	double *data = (double *)mxGetData(mxarr);
+	cout << data[0] << endl;
+	cout << data[0] << endl;
+	cout << data[99] << endl;
+	cout << data[100] << endl;
+
+
+	Mat img = imread(imgfilename);
+
+	for (int i = 0; i < numofpoint; i++) {
+		Scalar color = Scalar(0, 255, 0);
+		rectangle(InputOutputArray(img), Point(data[i]-5, data[numofpoint+i] - 5), Point(data[i] + 5, data[numofpoint+i] + 5), color);
+	}
+
+	imshow("demo", img);
+	cvWaitKey(0);
+	matClose(matfile);
+}
 
 #endif // !TEST_H

@@ -14,4 +14,33 @@ KeyPoints:
 	Light Effect Suppression Model(LESM) is used to extract the foreground, which combines MLBS and MFDM.
 	Oriented Inner Edges(OIEs) is applied to indicate the occlusion area.
 	A new method of perspective normalization is applied to furthest reduce the impact of perspective distortion.
+	MRE = mean relative error
+	MAE = mean absolute error
+	MSE = mean square error
+	SURF points
 
+Cross-scene Crowd Counting via Deep Convolutional Neural Networks
+KeyPoints:
+	108 crowd scenes with nearly 200,000 head annotations
+	Most state-of-art methods are scene-specific
+
+
+//2017.3.1
+Multi-SourceMulti-Scale Counting in Extremely Dense Crowd Images
+KeyPoints:
+	multiple sources: head detestions, repetition of texture elements, and frequency-domain analysis along with
+					confidence associated with observing individuals
+	Markov Random Field (Why use it?) For cross scene?
+	50 crowd images containing 64,000 peoples with head countings ranging from 94 to 4543
+
+//2017.3.3
+From Semi-Supervised to Transfer Counting of Crowds
+KeyPoints:
+	The most informative frames are selected for annotation automatically and actively.
+	The abundant unlabelled date are exploited.
+	Labelled data from other scenes are employed to further alleviate the burden for data annotation.
+	dataset: ucsd, mall, and hallway.
+	The semi-supervised regression model is builds on the Laplacian regularised least squares concept and Hessain energy.
+	active learning for regression: D-optimality and E-optimality designs.
+
+//2017.3.5
