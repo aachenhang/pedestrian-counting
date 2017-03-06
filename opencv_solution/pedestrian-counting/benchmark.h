@@ -26,6 +26,20 @@ time_t benchmark_time(int (*func)(char*), char* videofile) {
 }
 
 
+int benchmark_frame(char* videofile) {
+	VideoCapture cap(videofile);
+	int num = 0;
+	Mat frame;
+	while (cap.read(frame)) {
+		num++;
+	}
+
+	cout << "The num of frames is " << num << endl;
+
+	return 0;
+}
+
+
 int benchmark_foreground_extract(char* videofile) {
 
 	//cout << "The executing time is " << benchmark_time(mog2, videofile) << "s" << endl; //93s

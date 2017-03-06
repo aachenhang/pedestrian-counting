@@ -14,12 +14,13 @@ using namespace std;
 
 #include "foreground_extract.h"
 #include "benchmark.h"
+#include "create_dataset.h"
 #include "test.h"
 
+
 int main(int argc, char** argv) {
-	//char videofile[] = "F:/Downloads/8116_IP_01_20130224173726_20130224180008_2057515_0001.mp4";
-	char videofile[] = "F:/Downloads/8116_IP_segment_0.mp4";
-	
-	plotdemo();
+
+	makeAnnotation();
+
 	return 0;
 }

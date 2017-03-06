@@ -35,8 +35,8 @@ static __inline void mytest() {
 }
 
 void inline plotdemo() {
-	const char *matfilename = "F:/Downloads/Compressed/UCFCrowdCountingDataset_CVPR13/UCF_CC_50/44_ann.mat";
-	const char *imgfilename = "F:/Downloads/Compressed/UCFCrowdCountingDataset_CVPR13/UCF_CC_50/44.jpg";
+	const char *matfilename = "F:/Downloads/Compressed/UCFCrowdCountingDataset_CVPR13/UCF_CC_50/2_ann.mat";
+	const char *imgfilename = "F:/Downloads/Compressed/UCFCrowdCountingDataset_CVPR13/UCF_CC_50/2.jpg";
 	MATFile* matfile = matOpen(matfilename, "r");
 	mxArray *mxarr = matGetVariable(matfile, "annPoints");
 
@@ -59,6 +59,11 @@ void inline plotdemo() {
 
 	imshow("demo", img);
 	cvWaitKey(0);
+
+	Mat croppedimg = img(Rect(0, 0, 200, 200));
+	imshow("croppedimg", croppedimg);
+	cvWaitKey(0);
+
 	matClose(matfile);
 }
 
