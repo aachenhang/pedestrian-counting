@@ -67,4 +67,11 @@ void inline plotdemo() {
 	matClose(matfile);
 }
 
+
+void inline getsizeofimg() {
+
+	const char* imgfilename = "F:/Downloads/mydataset/0.jpg";
+	Mat img = imread(imgfilename);
+	cout << img.cols << endl;
+}
 #endif // !TEST_H
