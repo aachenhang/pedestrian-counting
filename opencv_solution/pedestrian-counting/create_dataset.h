@@ -12,12 +12,14 @@ using namespace std;
 #include <opencv2\imgproc\imgproc.hpp>
 using namespace cv;
 
+
 String imgfilename = "F:/Downloads/mydataset/1.jpg";
 String videofilename = "F:/Downloads/8116_IP_segment_0.mp4";
 String windowname = "makeAnnotation";
 fstream f("F:/Downloads/mydataset/1.txt", ios::out|ios::in);
 Scalar GREEN = Scalar(0, 255, 0);
 const int rectanglesize = 64;
+
 
 void mouseClick(int event, int x, int y, int flags, void* userdata) {
 	Mat* imgptr = (Mat*)userdata;
@@ -63,8 +65,6 @@ int makeAnnotation(int inputnum) {
 	destroyAllWindows();
 	return 0;
 }
-
-
 
 
 int catchimage(int inputnum) {
@@ -174,7 +174,7 @@ int createNegativeSample(int inputnum, int sum){
 		randy = rand() % (img.rows - rectanglesize + 1) + rectanglesize / 2;
 		int i;
 		for (i = 0; i < numofpoint; i++) {
-			if ((randx - x[i])*(randx - x[i]) + (randy - y[i])*(randy - y[i]) < 1.5*rectanglesize) {
+			if ((randx - x[i])*(randx - x[i]) + (randy - y[i])*(randy - y[i]) < rectanglesize*rectanglesize) {
 				break;
 			}
 		}

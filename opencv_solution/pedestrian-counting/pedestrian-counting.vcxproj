@@ -137,6 +137,7 @@
     <ClInclude Include="benchmark.h" />
     <ClInclude Include="create_dataset.h" />
     <ClInclude Include="foreground_extract.h" />
+    <ClInclude Include="process.h" />
     <ClInclude Include="test.h" />
   </ItemGroup>
   <ItemGroup>

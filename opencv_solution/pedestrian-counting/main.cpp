@@ -15,6 +15,7 @@ using namespace std;
 #include "benchmark.h"
 #include "create_dataset.h"
 #include "test.h"
+#include "process.h"
 
 
 int main(int argc, char** argv) {
@@ -61,6 +62,16 @@ int main(int argc, char** argv) {
 				createNegativeSample(i, 100);
 			}
 			break;
+		case 's':
+			hog_svm_save();
+			break;
+		case 'd':
+			double hitThreshold, finalThreshold;
+			cin >> hitThreshold >> finalThreshold;
+			hog_svm_detect(hitThreshold, finalThreshold);
+			break;
+		case 'q':
+			return 0;
 		default:
 			break;
 		}
