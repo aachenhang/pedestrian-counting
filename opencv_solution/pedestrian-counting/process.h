@@ -9,6 +9,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
+#include <iomanip>
 using namespace std;
 
 
@@ -23,10 +24,24 @@ using namespace ml;
 
 String positive_samples_file = "F:/Downloads/mydataset/positive_sample/";
 String negative_samples_file = "F:/Downloads/mydataset/negative_sample/";
+String CelebA_dataset_file = "E:/BaiduNetdiskDownload/CelebA/Img/img_align_celeba/";
 String svm_file = "F:/Downloads/mydataset/svm.xml";
 String image_test_file = "F:/Downloads/mydataset/34.jpg";
-const int positive_num = 2018;
-const int negative_num = 4050;
+const int positive_num = 3000;
+const int negative_num = 10000;
+const int CelebA_num = 202599;
+
+
+Mat imMirror(Mat img);
+void computeDescriptor(vector<vector<float>> &alldescriptors,
+					   String filepath,
+					   int label,
+	                   int numofsample,
+					   HOGDescriptor &hog,
+					   int fillflag);
+void hog_svm_save();
+void hog_svm_load(HOGDescriptor &hog);
+void hog_svm_detect(double hitThreshold, double finalThreshold);
 
 
 Mat imMirror(Mat img) {
@@ -44,25 +59,44 @@ Mat imMirror(Mat img) {
 }
 
 
-void computeDescriptor(vector<vector<float>> &alldescriptors, String filepath, int label, int numofsample, HOGDescriptor &hog) {
+void computeDescriptor(vector<vector<float>> &alldescriptors,
+					   String filepath,
+					   int label,
+					   int numofsample,
+					   HOGDescriptor &hog,
+					   int fillflag = 0) {
 	
 	for (int i = 0; i <= numofsample; i++) {
 		vector<float> descriptors, mirrordescriptors;
 		stringstream stream;
-		stream << filepath << i << ".jpg";
+		if (fillflag == 1) {
+			stream << filepath << setfill('0') << setw(6) << i << ".jpg";
+		}
+		else {
+			stream << filepath << i << ".jpg";
+		}
 		ifstream f(stream.str());
 		if (f.good()) {
 			cout << "compute " << stream.str() << endl;
 			Mat img = imread(stream.str());
+			if (fillflag == 1) {
+				int cols = img.cols;
+				int rows = img.rows;
+				Mat mid = img(Rect(0, (rows - cols) / 2, cols, cols));
+				resize(mid, img, Size(64, 64));
+			}
 			hog.compute(img, descriptors);
 			descriptors.push_back(label);
 			alldescriptors.push_back(descriptors);
-
+			
 			/* Compute the mirror image */
 			Mat imgmirror = imMirror(img);
 			hog.compute(imgmirror, mirrordescriptors);
 			descriptors.push_back(label);
 			alldescriptors.push_back(descriptors);
+		}
+		else {
+			cout << "miss: " << stream.str() << endl;
 		}
 	}
 }
@@ -70,6 +104,10 @@ void computeDescriptor(vector<vector<float>> &alldescriptors, String filepath, i
 
 
 void hog_svm_save() {
+
+	/* Initial the time counter */
+	time_t start = time(NULL);
+
 
 	/* Initial the SVM */
 	Ptr<SVM> svm = SVM::create();
@@ -86,8 +124,13 @@ void hog_svm_save() {
 	/* Initial the descriptors */
 	vector<vector<float>> alldescriptors;
 	
-	/* Compute the positive samples */
+	/* Compute the positive samples from my dataset */
 	computeDescriptor(alldescriptors, positive_samples_file, 1, positive_num, hog);
+	cout << "descriptors number: " << alldescriptors.size() << endl;
+
+
+	/* Compute the positive samples from CelebA dataset */
+	computeDescriptor(alldescriptors, CelebA_dataset_file, 1, CelebA_num, hog, 1);
 	cout << "descriptors number: " << alldescriptors.size() << endl;
 
 	/* Compute the negative samples */
@@ -107,9 +150,17 @@ void hog_svm_save() {
 		labelMat.at<int>(i, 0) = descriptor[descriptor.size()-1];	//Notice: Here the float is converted to int
 	}
 
+	/* Print the picture reading time */
+	time_t end = time(NULL);
+	cout << "cost: " << end - start << "s" << endl;
+
 	/* Train the svm */
+	cout << "Trainning starting..." << endl;
+	start = time(NULL);
 	svm->train(featureMat, ROW_SAMPLE, labelMat);
 	svm->save(svm_file);
+	end = time(NULL);
+	cout << "cost: " << end - start << "s" << endl;
 	cout << "save: " << svm_file << endl;
 }
 
@@ -145,32 +196,51 @@ void hog_svm_load(HOGDescriptor &hog) {
 }
 
 
-void hog_svm_detect(double hitThreshold, double finalThreshold) {
+void hog_svm_detect() {
 	
 	/* Load the hog detector */
 	Size winsize(64, 64), blocksize(16, 16), blockstep(8, 8), cellsize(8, 8);
 	int nbins = 9;
 	HOGDescriptor hog(winsize, blocksize, blockstep, cellsize, nbins);
 	hog_svm_load(hog);
+	while (1) {
+		/* Detect the image */
+		Mat img = imread(image_test_file);
+		vector<Rect> foundLoadcations;
+		double hitThreshold = 10.0;
+		cin >> hitThreshold;
+		if (hitThreshold == 0)	break;
+		Size winStride(8, 8);
+		Size padding(0, 0);
+		double scale = 1.05;
+		double finalThreshold = 100.0;
+		cin >> finalThreshold;
+		bool useMeanshiftGrouping = false;
+		hog.detectMultiScale(img, foundLoadcations, hitThreshold, winStride, padding, finalThreshold, useMeanshiftGrouping);
 
-	/* Detect the image */
-	Mat img = imread(image_test_file);
-	vector<Rect> foundLoadcations;
-	//double hitThreshold = 10.0;
-	Size winStride(8, 8);
-	Size padding(0, 0);
-	double scale = 1.05;
-	//double finalThreshold = 100.0;
-	bool useMeanshiftGrouping = false;
-	hog.detectMultiScale(img, foundLoadcations, hitThreshold, winStride, padding, finalThreshold, useMeanshiftGrouping);
-
-	/* Display the rectangle */
-	Scalar GREEN = Scalar(0, 255, 0);
-	for (int i = 0; i < foundLoadcations.size(); i++) {
-		rectangle(img, foundLoadcations[i], GREEN, 2);
+		/* Display the rectangle */
+		Scalar GREEN = Scalar(0, 255, 0);
+		for (int i = 0; i < foundLoadcations.size(); i++) {
+			rectangle(img, foundLoadcations[i], GREEN, 2);
+		}
+		imshow("Result", img);
+		waitKey(0);
+		destroyAllWindows();
 	}
-	imshow("Result", img);
+}
+
+
+void testResize() {
+	Mat img = imread(CelebA_dataset_file + "/000016.jpg");
+	imshow("origin", img);
+	int cols = img.cols;
+	int rows = img.rows;
+	cout << cols << endl;
+	cout << rows << endl;
+	Mat mid = img(Rect(0, (rows-cols)/2, cols, cols));
+	imshow("mid", mid);
+	resize(mid, img, Size(64, 64));
+	imshow("dst", img);
 	waitKey(0);
 	destroyAllWindows();
 }
-

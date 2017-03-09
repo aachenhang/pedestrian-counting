@@ -5,6 +5,9 @@
 #include <cstddef>
 #include <ctime>
 #include <iostream>
+#include <set>
+#include <vector>
+#include <map>
 
 
 #include <opencv2/core/core.hpp>
@@ -73,5 +76,39 @@ void inline getsizeofimg() {
 	const char* imgfilename = "F:/Downloads/mydataset/0.jpg";
 	Mat img = imread(imgfilename);
 	cout << img.cols << endl;
+}
+
+class Solution {
+public:
+	bool canCross(vector<int>& stones) {
+		map<int, set<int>> m;
+		for (int pos : stones) {
+			m[pos] = *(new set<int>);
+		}
+		m[stones[0]].insert(0);
+		for (int pos : stones) {
+			for (int gap : m[pos]) {
+				if (gap - 1 > 0 && m.find(pos + gap - 1) != m.end()) m[pos + gap - 1].insert(gap - 1);
+				if (gap > 0 && m.find(pos + gap) != m.end()) m[pos + gap].insert(gap);
+				if (gap + 1 > 0 && m.find(pos + gap + 1) != m.end()) m[pos + gap + 1].insert(gap + 1);
+			}
+		}
+		for (int pos : stones) {
+			for (int gap : m[pos]) {
+				cout << pos << " ";
+				cout << gap << endl;
+
+			}
+
+		}
+		return m[*(stones.end() - 1)].size() > 0;
+	}
+};
+
+inline void testleetcode() {
+	Solution sol;
+	int arr[] = { 0,1,3,4,5,7,9,10,12 };
+	vector<int> stones(arr, arr + sizeof(arr) / sizeof(int));
+	cout << sol.canCross(stones) << endl;
 }
 #endif // !TEST_H

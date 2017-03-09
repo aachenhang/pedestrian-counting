@@ -66,12 +66,19 @@ int main(int argc, char** argv) {
 			hog_svm_save();
 			break;
 		case 'd':
-			double hitThreshold, finalThreshold;
-			cin >> hitThreshold >> finalThreshold;
-			hog_svm_detect(hitThreshold, finalThreshold);
+			hog_svm_detect();
+			break;
+		case 'H':
+			createHardSample();
 			break;
 		case 'q':
 			return 0;
+		case 'l':
+			testleetcode();
+			break;
+		case 'r':
+			testResize();
+			break;
 		default:
 			break;
 		}

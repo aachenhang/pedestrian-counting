@@ -13,6 +13,9 @@ using namespace std;
 using namespace cv;
 
 
+#include "process.h"
+
+
 String imgfilename = "F:/Downloads/mydataset/1.jpg";
 String videofilename = "F:/Downloads/8116_IP_segment_0.mp4";
 String windowname = "makeAnnotation";
@@ -205,4 +208,42 @@ int createNegativeSample(int inputnum, int sum){
 	}
 
 	return 0;
+}
+
+
+void createHardSample() {
+
+	/* Load the hog detector */
+	Size winsize(64, 64), blocksize(16, 16), blockstep(8, 8), cellsize(8, 8);
+	int nbins = 9;
+	HOGDescriptor hog(winsize, blocksize, blockstep, cellsize, nbins);
+	Ptr<SVM> svm = SVM::load(svm_file);
+
+	/* Detect the image */
+	Mat img = imread("F:/Downloads/mydataset/positive_sample/40.jpg");
+	vector<Rect> foundLoadcations;
+	double hitThreshold = 1.0;
+	Size winStride(8, 8);
+	Size padding(0, 0);
+	double scale = 1;
+	double finalThreshold = 100.0;
+	bool useMeanshiftGrouping = true;
+	vector<double> foundWeights;
+	hog.detectMultiScale(img, foundLoadcations, foundWeights, hitThreshold, winStride, padding, finalThreshold, useMeanshiftGrouping);
+	cout << "FoundWeight: " << endl;
+	for (int i = 0; i < foundWeights.size(); i++) {
+		cout << foundWeights[i] << endl;
+	}
+	
+	/* Display the rectangle */
+	Scalar GREEN = Scalar(0, 255, 0);
+	for (int i = 0; i < foundLoadcations.size(); i++) {
+		rectangle(img, foundLoadcations[i], GREEN, 2);
+	}
+	imshow("Result", img);
+	waitKey(0);
+	destroyAllWindows();
+	//next_permutation
+	//Ptr<SVM> svm = SVM::create();
+	//svm->predict();
 }
