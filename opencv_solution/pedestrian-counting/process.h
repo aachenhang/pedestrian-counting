@@ -24,6 +24,7 @@ using namespace ml;
 
 String positive_samples_file = "F:/Downloads/mydataset/positive_sample/";
 String negative_samples_file = "F:/Downloads/mydataset/negative_sample/";
+String hard_samples_file = "F:/Downloads/mydataset/hard_sample/";
 String CelebA_dataset_file = "E:/BaiduNetdiskDownload/CelebA/Img/img_align_celeba/";
 //String svm_file = "F:/Downloads/mydataset/svm.xml";
 String svm_file = "F:/Downloads/mydataset/svm_3000_25000.xml";

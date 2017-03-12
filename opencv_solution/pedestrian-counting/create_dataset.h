@@ -221,20 +221,35 @@ void createHardSample() {
 	cout << "load: " << svm_file << endl;
 
 	/* Predict the negative samples */
-	string testfile = "F:/Downloads/mydataset/negative_sample/5.jpg";
-	vector<float> descriptor;
-	vector<vector<float>> inputdata;
-	hog.compute(imread(testfile), descriptor);
-	Mat featureMat(1, descriptor.size(), CV_32FC1);
-	int rows = 1;
-	int cols = descriptor.size();
-	cout << cols << endl;
-	cout << svm->getVarCount() << endl;
-	for (int i = 0; i < rows; i++) {
-		for (int j = 0; j < cols; j++) {
-			featureMat.at<float>(i, j) = descriptor[j];
+	int hardnum = 0;
+	for (int i = 0; i < negative_num; i++) {
+		stringstream stream;
+		stream << negative_samples_file << i << ".jpg";
+		if (ifstream(stream.str()).good()) {
+
+			vector<float> descriptor;
+			Mat mat = imread(stream.str());
+			hog.compute(mat, descriptor);
+			Mat featureMat(1, descriptor.size(), CV_32FC1);
+			int cols = descriptor.size();
+			for (int j = 0; j < cols; j++) {
+				featureMat.at<float>(0, j) = descriptor[j];
+			}
+			if (svm->predict(featureMat) != -1) {
+				while (1) {
+					stringstream hardstream;
+					hardstream << hard_samples_file << hardnum << ".jpg";
+					if (ifstream(hardstream.str()).good()) {
+						hardnum++;
+					}
+					else {
+						imwrite(hardstream.str(), mat);
+						cout << "create : " << hardstream.str() << endl;
+						hardnum++;
+						break;
+					}
+				}
+			}
 		}
 	}
-	cout << svm->predict(featureMat) << endl;
-	
 }
