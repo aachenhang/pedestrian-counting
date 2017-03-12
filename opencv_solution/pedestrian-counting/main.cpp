@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
 		int inputnum;
 		int sum;
 		cin >> c;
+		//c = 'H';
 		switch (c)
 		{
 		case 'c':
@@ -78,6 +79,9 @@ int main(int argc, char** argv) {
 			break;
 		case 'r':
 			testResize();
+			break;
+		case 't':
+			mergeLocation(*(new vector<Rect>));
 			break;
 		default:
 			break;

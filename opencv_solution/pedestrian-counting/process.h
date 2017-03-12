@@ -25,11 +25,13 @@ using namespace ml;
 String positive_samples_file = "F:/Downloads/mydataset/positive_sample/";
 String negative_samples_file = "F:/Downloads/mydataset/negative_sample/";
 String CelebA_dataset_file = "E:/BaiduNetdiskDownload/CelebA/Img/img_align_celeba/";
-String svm_file = "F:/Downloads/mydataset/svm.xml";
-String image_test_file = "F:/Downloads/mydataset/34.jpg";
+//String svm_file = "F:/Downloads/mydataset/svm.xml";
+String svm_file = "F:/Downloads/mydataset/svm_3000_25000.xml";
+String image_test_file = "F:/Downloads/mydataset/35.jpg";
 const int positive_num = 3000;
-const int negative_num = 10000;
+const int negative_num = 25000;
 const int CelebA_num = 202599;
+int mergeset[10005];
 
 
 Mat imMirror(Mat img);
@@ -41,7 +43,12 @@ void computeDescriptor(vector<vector<float>> &alldescriptors,
 					   int fillflag);
 void hog_svm_save();
 void hog_svm_load(HOGDescriptor &hog);
-void hog_svm_detect(double hitThreshold, double finalThreshold);
+void hog_svm_detect();
+vector<Rect> mergeLocation(const vector<Rect> foundLocations);
+int findRoot(int pos);
+void merge(int a, int b);
+bool canMerge(Rect a, Rect b);
+bool cmp(Rect a, Rect b);
 
 
 Mat imMirror(Mat img) {
@@ -129,9 +136,9 @@ void hog_svm_save() {
 	cout << "descriptors number: " << alldescriptors.size() << endl;
 
 
-	/* Compute the positive samples from CelebA dataset */
+	/* Compute the positive samples from CelebA dataset *//*
 	computeDescriptor(alldescriptors, CelebA_dataset_file, 1, CelebA_num, hog, 1);
-	cout << "descriptors number: " << alldescriptors.size() << endl;
+	cout << "descriptors number: " << alldescriptors.size() << endl;*/
 
 	/* Compute the negative samples */
 	computeDescriptor(alldescriptors, negative_samples_file, -1, negative_num, hog);
@@ -139,7 +146,7 @@ void hog_svm_save() {
 
 	/* Set the featureMat and labelMat */
 	int rows = alldescriptors.size();
-	int cols = alldescriptors.begin()->size();
+	int cols = alldescriptors.begin()->size() - 1;
 	Mat featureMat(rows, cols, CV_32FC1);
 	Mat labelMat(rows, 1, CV_32SC1);
 	for (int i = 0; i < rows; i++) {
@@ -206,7 +213,7 @@ void hog_svm_detect() {
 	while (1) {
 		/* Detect the image */
 		Mat img = imread(image_test_file);
-		vector<Rect> foundLoadcations;
+		vector<Rect> foundLocations;
 		double hitThreshold = 10.0;
 		cin >> hitThreshold;
 		if (hitThreshold == 0)	break;
@@ -216,12 +223,21 @@ void hog_svm_detect() {
 		double finalThreshold = 100.0;
 		cin >> finalThreshold;
 		bool useMeanshiftGrouping = false;
-		hog.detectMultiScale(img, foundLoadcations, hitThreshold, winStride, padding, finalThreshold, useMeanshiftGrouping);
+		hog.detectMultiScale(img, foundLocations, hitThreshold, winStride, padding, finalThreshold, useMeanshiftGrouping);
+
+		/* Merge the locations */
+		vector<Rect> res = mergeLocation(foundLocations);
+
+		/* Print the locations */
+		sort(res.begin(), res.end(), cmp);
+		for (Rect rect : res) {
+			cout << rect.x << " " << rect.y << endl;
+		}
 
 		/* Display the rectangle */
 		Scalar GREEN = Scalar(0, 255, 0);
-		for (int i = 0; i < foundLoadcations.size(); i++) {
-			rectangle(img, foundLoadcations[i], GREEN, 2);
+		for (int i = 0; i < res.size(); i++) {
+			rectangle(img, res[i], GREEN, 2);
 		}
 		imshow("Result", img);
 		waitKey(0);
@@ -243,4 +259,57 @@ void testResize() {
 	imshow("dst", img);
 	waitKey(0);
 	destroyAllWindows();
+}
+
+
+
+vector<Rect> mergeLocation(const vector<Rect> foundLocations) {
+	for (int i = 0; i < foundLocations.size(); i++) {
+		mergeset[i] = -1;
+		for (int j = 0; j < i; j++) {
+			if (canMerge(foundLocations[i], foundLocations[j])) {
+				merge(i, j);
+			}
+		}
+	}
+	vector<Rect> res;
+	for (int i = 0; i < foundLocations.size(); i++) {
+		int cnt = 0;
+		Rect cur(0, 0, 64, 64);
+		for (int j = 0; j < foundLocations.size(); j++) {
+			if (findRoot(j) == i) {
+				cnt++;
+				cur.x += foundLocations[j].x;
+				cur.y += foundLocations[j].y;
+			}
+		}
+		if (cnt != 0) {
+			cur.x /= cnt;
+			cur.y /= cnt;
+			res.push_back(cur);
+		}
+	}
+	return res;
+}
+
+
+int findRoot(int pos) {
+	return mergeset[pos] == -1 ? pos : mergeset[pos] = findRoot(mergeset[pos]);
+}
+
+
+void merge(int a, int b) {
+	if (a > b)	swap(a, b);
+	mergeset[b] = findRoot(a);
+}
+
+
+bool canMerge(Rect a, Rect b) {
+	/* step size = 8, can be merge if not more than 2 steps */
+	return abs(a.x - b.x) + abs(a.y - b.y) <= 8 * 2;
+}
+
+
+bool cmp(Rect a, Rect b) {
+	return a.x < b.x || a.x == b.x && a.y < b.y;
 }

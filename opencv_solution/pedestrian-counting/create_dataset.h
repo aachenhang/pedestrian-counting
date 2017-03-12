@@ -218,32 +218,23 @@ void createHardSample() {
 	int nbins = 9;
 	HOGDescriptor hog(winsize, blocksize, blockstep, cellsize, nbins);
 	Ptr<SVM> svm = SVM::load(svm_file);
+	cout << "load: " << svm_file << endl;
 
-	/* Detect the image */
-	Mat img = imread("F:/Downloads/mydataset/positive_sample/40.jpg");
-	vector<Rect> foundLoadcations;
-	double hitThreshold = 1.0;
-	Size winStride(8, 8);
-	Size padding(0, 0);
-	double scale = 1;
-	double finalThreshold = 100.0;
-	bool useMeanshiftGrouping = true;
-	vector<double> foundWeights;
-	hog.detectMultiScale(img, foundLoadcations, foundWeights, hitThreshold, winStride, padding, finalThreshold, useMeanshiftGrouping);
-	cout << "FoundWeight: " << endl;
-	for (int i = 0; i < foundWeights.size(); i++) {
-		cout << foundWeights[i] << endl;
+	/* Predict the negative samples */
+	string testfile = "F:/Downloads/mydataset/negative_sample/5.jpg";
+	vector<float> descriptor;
+	vector<vector<float>> inputdata;
+	hog.compute(imread(testfile), descriptor);
+	Mat featureMat(1, descriptor.size(), CV_32FC1);
+	int rows = 1;
+	int cols = descriptor.size();
+	cout << cols << endl;
+	cout << svm->getVarCount() << endl;
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			featureMat.at<float>(i, j) = descriptor[j];
+		}
 	}
+	cout << svm->predict(featureMat) << endl;
 	
-	/* Display the rectangle */
-	Scalar GREEN = Scalar(0, 255, 0);
-	for (int i = 0; i < foundLoadcations.size(); i++) {
-		rectangle(img, foundLoadcations[i], GREEN, 2);
-	}
-	imshow("Result", img);
-	waitKey(0);
-	destroyAllWindows();
-	//next_permutation
-	//Ptr<SVM> svm = SVM::create();
-	//svm->predict();
 }
