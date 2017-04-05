@@ -34,6 +34,7 @@ void print_help() {
 	cout << "d : hog_svm_detect(), cal the svm + hog testing" << endl;
 	cout << "H : createHardSample(), find wrong answer from positive_sample and negative_sample using svm model" << endl;
 	cout << "v : sample1_convnet(), cal the CNN training" << endl;
+	cout << "t : convnet_test(), cal the cnn testing" << endl;
 	cout << "h : print_help()" << endl;
 	cout << "q : quit" << endl;
 }
@@ -89,6 +90,9 @@ int main(int argc, char** argv) {
 			break;
 		case 'v':
 			sample1_convnet();
+			break;
+		case 't':
+			convnet_test();
 			break;
 		case 'h':
 			print_help();

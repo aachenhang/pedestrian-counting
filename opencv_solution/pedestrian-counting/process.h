@@ -49,7 +49,7 @@ void computeDescriptor(vector<vector<float>> &alldescriptors,
 void hog_svm_save();
 void hog_svm_load(HOGDescriptor &hog);
 void hog_svm_detect();
-vector<Rect> mergeLocation(const vector<Rect> foundLocations);
+vector<Rect> mergeLocation(const vector<Rect>& foundLocations);
 int findRoot(int pos);
 void merge(int a, int b);
 bool canMerge(Rect a, Rect b);
@@ -275,7 +275,7 @@ void testResize() {
 
 
 
-vector<Rect> mergeLocation(const vector<Rect> foundLocations) {
+vector<Rect> mergeLocation(const vector<Rect>& foundLocations) {
 	for (int i = 0; i < foundLocations.size(); i++) {
 		mergeset[i] = -1;
 		for (int j = 0; j < i; j++) {

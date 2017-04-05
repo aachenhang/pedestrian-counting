@@ -37,7 +37,7 @@ void load_sample(vector<vec_t>& train_images,
 	int label,
 	int numofsample,
 	int fillflag = 0);
-
+void convnet_test(String imgFileName = image_test_file);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -109,6 +109,7 @@ void sample1_convnet() {
 	// save networks
 	std::ofstream ofs("LeNet-weights");
 	ofs << nn;
+	ofs.close();
 }
 
 
@@ -195,4 +196,48 @@ void load_sample(vector<vec_t>& train_images,
 			cout << "miss: " << stream.str() << endl;
 		}
 	}
+}
+
+
+void convnet_test(String imgFileName) {
+	/* Load the convolution network */
+	network<sequential> nn;
+	nn.load("LeNet-weights");
+
+	/* convert imagefile to vec_t */
+	vector<Rect> foundLocations;
+	vector<Rect> res;
+
+	Mat img = imread(imgFileName, IMREAD_GRAYSCALE);
+
+	for (int i = 0; i < img.rows - 64; i++) {
+		for (int j = 0; j < img.cols - 64; j++) {
+			cv::Mat_<uint8_t> resized;
+			vec_t d;
+			Mat tmp = img(Rect(i, j, 64, 64));
+			cv::resize(tmp, resized, cv::Size(32, 32));
+			std::transform(resized.begin(), resized.end(), std::back_inserter(d),
+				[=](uint8_t c) { return c * 1.0; });
+			auto prediction = nn.predict(d);
+			label_t label = (prediction[0] > prediction[1] ? 0 : 1);
+
+			if (label == 1) {
+				foundLocations.push_back(Rect(i, j, 64, 64));
+			}
+
+		}
+	}
+
+	/* Merge the location */
+	res = mergeLocation(foundLocations);
+
+	/* Display the rectangle */
+	img = imread(imgFileName);
+	Scalar GREEN = Scalar(0, 255, 0);
+	for (int i = 0; i < res.size(); i++) {
+		rectangle(img, res[i], GREEN, 2);
+	}
+	imshow("Result", img);
+	waitKey(0);
+	destroyAllWindows();
 }
