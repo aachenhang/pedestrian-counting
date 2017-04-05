@@ -220,7 +220,7 @@ void createHardSample() {
 	Ptr<SVM> svm = SVM::load(svm_file);
 	cout << "load: " << svm_file << endl;
 
-	/* Predict the negative samples */
+	/* Create the negative hard samples */
 	int hardnum = 0;
 	for (int i = 0; i < negative_num; i++) {
 		stringstream stream;
@@ -236,9 +236,44 @@ void createHardSample() {
 				featureMat.at<float>(0, j) = descriptor[j];
 			}
 			if (svm->predict(featureMat) != -1) {
+				cout << "Detected hard sample: " << stream.str() << endl;
 				while (1) {
 					stringstream hardstream;
-					hardstream << hard_samples_file << hardnum << ".jpg";
+					hardstream << negative_hard_samples_file << hardnum << ".jpg";
+					if (ifstream(hardstream.str()).good()) {
+						hardnum++;
+					}
+					else {
+						imwrite(hardstream.str(), mat);
+						cout << "create : " << hardstream.str() << endl;
+						hardnum++;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	/* Create the positive hard samples */
+	hardnum = 0;
+	for (int i = 0; i < positive_num; i++) {
+		stringstream stream;
+		stream << positive_samples_file << i << ".jpg";
+		if (ifstream(stream.str()).good()) {
+
+			vector<float> descriptor;
+			Mat mat = imread(stream.str());
+			hog.compute(mat, descriptor);
+			Mat featureMat(1, descriptor.size(), CV_32FC1);
+			int cols = descriptor.size();
+			for (int j = 0; j < cols; j++) {
+				featureMat.at<float>(0, j) = descriptor[j];
+			}
+			if (svm->predict(featureMat) != 1) {
+				cout << "Detected hard sample: " << stream.str() << endl;
+				while (1) {
+					stringstream hardstream;
+					hardstream << positive_hard_samples_file << hardnum << ".jpg";
 					if (ifstream(hardstream.str()).good()) {
 						hardnum++;
 					}

@@ -24,14 +24,18 @@ using namespace ml;
 
 String positive_samples_file = "F:/Downloads/mydataset/positive_sample/";
 String negative_samples_file = "F:/Downloads/mydataset/negative_sample/";
-String hard_samples_file = "F:/Downloads/mydataset/hard_sample/";
+String positive_hard_samples_file = "F:/Downloads/mydataset/positive_hard_sample/";
+String negative_hard_samples_file = "F:/Downloads/mydataset/negative_hard_sample/";
 String CelebA_dataset_file = "E:/BaiduNetdiskDownload/CelebA/Img/img_align_celeba/";
 //String svm_file = "F:/Downloads/mydataset/svm.xml";
 String svm_file = "F:/Downloads/mydataset/svm_3000_25000.xml";
-String image_test_file = "F:/Downloads/mydataset/35.jpg";
+String image_test_file = "F:/Downloads/mydataset/34.jpg";
 const int positive_num = 3000;
 const int negative_num = 25000;
 const int CelebA_num = 202599;
+const int positive_hard_num = 1000;
+const int negative_hard_num = 100;
+const int FILL_ZERO = 1;
 int mergeset[10005];
 
 
@@ -138,12 +142,19 @@ void hog_svm_save() {
 
 
 	/* Compute the positive samples from CelebA dataset *//*
-	computeDescriptor(alldescriptors, CelebA_dataset_file, 1, CelebA_num, hog, 1);
+	computeDescriptor(alldescriptors, CelebA_dataset_file, 1, CelebA_num, hog, FILL_ZERO);
 	cout << "descriptors number: " << alldescriptors.size() << endl;*/
 
 	/* Compute the negative samples */
 	computeDescriptor(alldescriptors, negative_samples_file, -1, negative_num, hog);
 	cout << "descriptors number: " << alldescriptors.size() << endl;
+
+	/* Compute the positive hard samples */
+	computeDescriptor(alldescriptors, positive_hard_samples_file, 1, positive_hard_num, hog);
+	cout << "descriptors number: " << alldescriptors.size() << endl;
+
+	/* Compute the negative hard samples */
+	computeDescriptor(alldescriptors, negative_hard_samples_file, -1, negative_hard_num, hog);
 
 	/* Set the featureMat and labelMat */
 	int rows = alldescriptors.size();

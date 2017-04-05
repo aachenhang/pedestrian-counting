@@ -118,7 +118,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalUsingDirectories>H:\Downloads\opencv\build\include;%(AdditionalUsingDirectories)</AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>H:\Downloads\opencv\build\include;C:\Program Files\MATLAB\R2016b\extern\include;H:\Downloads\libvibe++\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>H:\Downloads\opencv\build\include;C:\Program Files\MATLAB\R2016b\extern\include;H:\Downloads\libvibe++\src;C:\Users\aachenhang\Source\Repos\tiny-dnn;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -139,6 +139,7 @@
     <ClInclude Include="foreground_extract.h" />
     <ClInclude Include="process.h" />
     <ClInclude Include="test.h" />
+    <ClInclude Include="tiny-dnn.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="MyReadingList.txt" />

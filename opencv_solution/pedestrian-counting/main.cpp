@@ -16,7 +16,27 @@ using namespace std;
 #include "create_dataset.h"
 #include "test.h"
 #include "process.h"
+#include "tiny-dnn.h"
 
+void print_help() {
+	cout << "*****************************************************************************" << endl;
+	cout << "******   This is aachenhang's opencv project to count the pedestrain   ******" << endl;
+	cout << "******   Version: 0.1.1        Operation System: win10 64bits          ******" << endl;
+	cout << "******   opencv: 3.2           Visual Studio: vs2015/v14               ******" << endl;
+	cout << "*****************************************************************************" << endl;
+	cout << "Input the order to cal the function: " << endl;
+	cout << "c : cropimage(), crop the 64*64 image from the large 1920*1088 image." << endl;
+	cout << "m : makeAnnotation(), open the 1920*1088 image to add annotation manually." << endl;
+	cout << "i : catchimage(), catch 5 pieces of 1920*1088 images from 1 min's video." << endl;
+	cout << "n : createNegativeSample(), create negative sample randomly according to the annotation txt" << endl;
+	cout << "N : cal createNegativeSample() for 100 times for all the 20 pieces of 1920*1088 image" << endl;
+	cout << "s : hog_svm_save(), cal the svm + hog training" << endl;
+	cout << "d : hog_svm_detect(), cal the svm + hog testing" << endl;
+	cout << "H : createHardSample(), find wrong answer from positive_sample and negative_sample using svm model" << endl;
+	cout << "v : sample1_convnet(), cal the CNN training" << endl;
+	cout << "h : print_help()" << endl;
+	cout << "q : quit" << endl;
+}
 
 int main(int argc, char** argv) {
 	while (1) {
@@ -25,7 +45,6 @@ int main(int argc, char** argv) {
 		int inputnum;
 		int sum;
 		cin >> c;
-		//c = 'H';
 		switch (c)
 		{
 		case 'c':
@@ -33,10 +52,6 @@ int main(int argc, char** argv) {
 			cout << "input the offset: " << endl;
 			cin >> inputnum;
 			cropimage(inputnum);
-			break;
-		case 'g':
-			cout << "getsizeofimg" << endl;
-			getsizeofimg();
 			break;
 		case 'm':
 			cout << "makeAnnotation" << endl;
@@ -72,17 +87,14 @@ int main(int argc, char** argv) {
 		case 'H':
 			createHardSample();
 			break;
+		case 'v':
+			sample1_convnet();
+			break;
+		case 'h':
+			print_help();
+			break;
 		case 'q':
 			return 0;
-		case 'l':
-			testleetcode();
-			break;
-		case 'r':
-			testResize();
-			break;
-		case 't':
-			mergeLocation(*(new vector<Rect>));
-			break;
 		default:
 			break;
 		}
