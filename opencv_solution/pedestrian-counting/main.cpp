@@ -17,6 +17,8 @@ using namespace std;
 #include "test.h"
 #include "process.h"
 #include "tiny-dnn.h"
+#include "facedetect.h"
+#include "constants_list.h"
 
 void print_help() {
 	cout << "*****************************************************************************" << endl;
@@ -35,6 +37,8 @@ void print_help() {
 	cout << "H : createHardSample(), find wrong answer from positive_sample and negative_sample using svm model" << endl;
 	cout << "v : sample1_convnet(), cal the CNN training" << endl;
 	cout << "t : convnet_test(), cal the cnn testing" << endl;
+	cout << "f : facedetect_main(), cal the interal function to detect face" << endl;
+	cout << "T : test(), the gatedoor of testing" << endl;
 	cout << "h : print_help()" << endl;
 	cout << "q : quit" << endl;
 }
@@ -45,6 +49,10 @@ int main(int argc, char** argv) {
 		char c;
 		int inputnum;
 		int sum;
+		string inputstr;
+		stringstream stream;
+		int _argc;
+		char** _argv;
 		cin >> c;
 		switch (c)
 		{
@@ -89,13 +97,33 @@ int main(int argc, char** argv) {
 			createHardSample();
 			break;
 		case 'v':
-			sample1_convnet();
+			cout << "input the minibatch: " << endl;
+			cin >> inputnum;
+			sample1_convnet(inputnum);
 			break;
 		case 't':
 			convnet_test();
 			break;
 		case 'h':
 			print_help();
+			break;
+		case 'f':
+			cout << "input the argv: " << endl;
+			getchar();
+			getline(cin, inputstr);
+			stream.str(inputstr);
+			_argv = new char*[10];
+			_argc = 0;
+			while (!stream.eof()) {
+				char* str = new char[105];
+				stream >> str;
+				_argv[_argc++] = str;
+			}
+			facedetect_main(_argc, _argv);
+			delete[] _argv;
+			break;
+		case 'T':
+			test();
 			break;
 		case 'q':
 			return 0;

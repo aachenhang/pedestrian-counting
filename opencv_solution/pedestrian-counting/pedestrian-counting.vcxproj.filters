@@ -24,6 +24,27 @@
     <ClCompile Include="..\..\..\..\..\Desktop\毕设论文\vibe\libvibe++\src\libvibe++\common\ViBeBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="facedetect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="create_dataset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="process.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="merge_location.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="constants_list.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tiny-dnn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="foreground_extract.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="test.h">
@@ -44,10 +65,19 @@
     <ClInclude Include="tiny-dnn.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="merge_location.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="constants_list.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="facedetect.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="MyReadingList.txt">
-      <Filter>Source Files</Filter>
+      <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
 </Project>
