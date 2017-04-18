@@ -52,59 +52,59 @@ int knnextract(char *video) {
 	return 0;
 }
 
-#include <libvibe++/ViBe.h>
-#include <libvibe++/distances/Manhattan.h>
-#include <stdint.h>
-//#include <libvibe++/system/types.h>
-
-using namespace std;
-using namespace ViBe;
-
-int Vibe(char* video) {
-
-	/* Parameterization of ViBe. */
-	typedef ViBeSequential<1, Manhattan<1> >	ViBe;
-
-	/* Random seed. */
-	srand(time(NULL));
-
-	cv::VideoCapture decoder(video);
-	cv::Mat frame;
-
-	int height = (int)decoder.get(CV_CAP_PROP_FRAME_HEIGHT);
-	int width = (int)decoder.get(CV_CAP_PROP_FRAME_WIDTH);
-
-	ViBe* vibe = NULL;
-	cv::Mat bwFrame(height, width, CV_8UC1);
-	cv::Mat segmentationMap(height, width, CV_8UC1);
-	bool firstFrame = true;
-
-	while (decoder.read(frame)) {
-		cv::cvtColor(frame, bwFrame, CV_RGB2GRAY);
-
-		if (firstFrame) {
-			/* Instantiation of ViBe. */
-			vibe = new ViBe(height, width, bwFrame.data);
-			firstFrame = false;
-		}
-
-		/* Segmentation and update. */
-		vibe->_CRTP_segmentation(bwFrame.data, segmentationMap.data);
-		vibe->_CRTP_update(bwFrame.data, segmentationMap.data);
-
-		/* Post-processing: 3x3 median filter. */
-		medianBlur(segmentationMap, segmentationMap, 3);
-
-		//imshow("Input video", bwFrame);
-		//imshow("Segmentation by ViBe", segmentationMap);
-
-		//cvWaitKey(1);
-	}
-
-	delete vibe;
-
-	cvDestroyAllWindows();
-	decoder.release();
-
-	return EXIT_SUCCESS;
-}
+//#include <libvibe++/ViBe.h>
+//#include <libvibe++/distances/Manhattan.h>
+//#include <stdint.h>
+////#include <libvibe++/system/types.h>
+//
+//using namespace std;
+//using namespace ViBe;
+//
+//int Vibe(char* video) {
+//
+//	/* Parameterization of ViBe. */
+//	typedef ViBeSequential<1, Manhattan<1> >	ViBe;
+//
+//	/* Random seed. */
+//	srand(time(NULL));
+//
+//	cv::VideoCapture decoder(video);
+//	cv::Mat frame;
+//
+//	int height = (int)decoder.get(CV_CAP_PROP_FRAME_HEIGHT);
+//	int width = (int)decoder.get(CV_CAP_PROP_FRAME_WIDTH);
+//
+//	ViBe* vibe = NULL;
+//	cv::Mat bwFrame(height, width, CV_8UC1);
+//	cv::Mat segmentationMap(height, width, CV_8UC1);
+//	bool firstFrame = true;
+//
+//	while (decoder.read(frame)) {
+//		cv::cvtColor(frame, bwFrame, CV_RGB2GRAY);
+//
+//		if (firstFrame) {
+//			/* Instantiation of ViBe. */
+//			vibe = new ViBe(height, width, bwFrame.data);
+//			firstFrame = false;
+//		}
+//
+//		/* Segmentation and update. */
+//		vibe->_CRTP_segmentation(bwFrame.data, segmentationMap.data);
+//		vibe->_CRTP_update(bwFrame.data, segmentationMap.data);
+//
+//		/* Post-processing: 3x3 median filter. */
+//		medianBlur(segmentationMap, segmentationMap, 3);
+//
+//		//imshow("Input video", bwFrame);
+//		//imshow("Segmentation by ViBe", segmentationMap);
+//
+//		//cvWaitKey(1);
+//	}
+//
+//	delete vibe;
+//
+//	cvDestroyAllWindows();
+//	decoder.release();
+//
+//	return EXIT_SUCCESS;
+//}

@@ -8,11 +8,11 @@ in the LICENSE file.
 */
 #include <algorithm>
 #include <iostream>
-#include <memory>
 #include <string>
 #include <vector>
 
 #include <opencv2/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 #include "tiny_dnn/tiny_dnn.h"
 #include "process.h"
 #include "merge_location.h"
@@ -24,90 +24,142 @@ using namespace tiny_dnn::activation;
 using namespace tiny_dnn::layers;
 
 using namespace std;
+using namespace cv;
 
 ///////////////////////////////////////////////////////////////////////////////
 // learning convolutional neural networks (LeNet-5 like architecture)
-void sample1_convnet(int minibatch_size = 10) {
+void sample1_convnet(float alpha) {
 	// construct LeNet-5 architecture
 	network<sequential> nn;
-	adagrad optimizer;
-
-	// connection table [Y.Lecun, 1998 Table.1]
-#define O true
-#define X false
-	// clang-format off
-	static const bool connection[] = {
-		O, X, X, X, O, O, O, X, X, O, O, O, O, X, O, O,
-		O, O, X, X, X, O, O, O, X, X, O, O, O, O, X, O,
-		O, O, O, X, X, X, O, O, O, X, X, O, X, O, O, O,
-		X, O, O, O, X, X, O, O, O, O, X, X, O, X, O, O,
-		X, X, O, O, O, X, X, O, O, O, O, X, O, O, X, O,
-		X, X, X, O, O, O, X, X, O, O, O, O, X, O, O, O
-	};
-	// clang-format on
-#undef O
-#undef X
-
-	nn << convolutional_layer<tan_h>(32, 32, 5, 1,
-		6) /* 32x32 in, 5x5 kernel, 1-6 fmaps conv */
-		<< average_pooling_layer<tan_h>(28, 28, 6,
-			2) /* 28x28 in, 6 fmaps, 2x2 subsampling */
-		<< convolutional_layer<tan_h>(14, 14, 5, 6, 16,
-			connection_table(connection, 6, 16))
-		<< average_pooling_layer<tan_h>(10, 10, 16, 2)
-		<< convolutional_layer<tan_h>(5, 5, 5, 16, 120)
-		<< fully_connected_layer<tan_h>(120, 3);
-
-	std::cout << "load models..." << std::endl;
 
 	// load MNIST dataset
 	std::vector<label_t> train_labels;
 	std::vector<vec_t> train_images;
 
 	load_mydataset(train_images, train_labels);
-	/*
-	cout << "watch train_images size" << endl;
-	cout << train_images.size() << endl;
+	adagrad optimizer;
+	while (1) {
+		int epoch;
+		cout << "cin the alpha, original alpha is 0.01" << endl;
+		cin >> alpha;
+		cout << "cin the epoch, original epoch is 20" << endl;
+		cin >> epoch;
+		// connection table [Y.Lecun, 1998 Table.1]
+	#define O true
+	#define X false
+		// clang-format off
+		static const bool connection[] = {
+			O, X, X, X, O, O, O, X, X, O, O, O, O, X, O, O,
+			O, O, X, X, X, O, O, O, X, X, O, O, O, O, X, O,
+			O, O, O, X, X, X, O, O, O, X, X, O, X, O, O, O,
+			X, O, O, O, X, X, O, O, O, O, X, X, O, X, O, O,
+			X, X, O, O, O, X, X, O, O, O, O, X, O, O, X, O,
+			X, X, X, O, O, O, X, X, O, O, O, O, X, O, O, O
+		};
+		// clang-format on
+	#undef O
+	#undef X
 
-	cout << "watch train_labels size" << endl;
-	cout << train_labels.size() << endl;
+		/*
+			input : 1@64*64
+			C1 :	3@60*60
+			S2 :	3@30*30
+			C3 :	9@26*26
+			S4 :	9@13*13
+			C5 :	27@9*9
+			S6 :	27@3*3
+			C7 :	91@1
+			F8 :	2
+		*/
+		/*nn << convolutional_layer<tan_h>(64, 64, 5, 1, 3)
+			<< average_pooling_layer<tan_h>(60, 60, 3, 2)
+			<< convolutional_layer<tan_h>(30, 30, 5, 3, 9)
+			<< average_pooling_layer<tan_h>(26, 26, 9, 2)
+			<< convolutional_layer<tan_h>(13, 13, 5, 9, 27)
+			<< average_pooling_layer<tan_h>(9, 9, 27, 3)
+			<< convolutional_layer<tan_h>(3, 3, 3, 27, 91)
+			<< fully_connected_layer<tan_h>(91, 2);*/
 
-	cout << "watch train_images[0]" << endl;
-	for (auto t : train_images[0]) {
-	cout << t << endl;
+
+		/*
+			epoch : 20
+			alpha : 0.01
+			input : 1@64*64
+			C1 :	10@60*60
+			S2 :	10@30*30
+			C3 :	100@26*26
+			S4 :	100@13*13
+			C5 :	500@9*9
+			S6 :	500@3*3
+			C7 :	1000@1
+			F8 :	2
+		*//*
+		nn << convolutional_layer<tan_h>(64, 64, 5, 1, 10)
+			<< average_pooling_layer<tan_h>(60, 60, 10, 2)
+			<< convolutional_layer<tan_h>(30, 30, 5, 10, 100)
+			<< average_pooling_layer<tan_h>(26, 26, 100, 2)
+			<< convolutional_layer<tan_h>(13, 13, 5, 100, 500)
+			<< average_pooling_layer<tan_h>(9, 9, 500, 3)
+			<< convolutional_layer<tan_h>(3, 3, 3, 500, 1000)
+			<< fully_connected_layer<tan_h>(1000, 2);*/
+
+		/*epoch: 20
+		alpha : 0.01
+		input : 1@64*64
+		C1 :	5@60*60
+		S2 :	5@30*30
+		C3 :	25@26*26
+		S4 :	25@13*13
+		C5 :	125@9*9
+		S6 :	125@3*3
+		C7 :	125@1
+		F8 : 2*/
+
+		
+		nn << convolutional_layer<tan_h>(64, 64, 5, 1, 3)
+		<< average_pooling_layer<tan_h>(60, 60, 3, 2)
+		<< convolutional_layer<tan_h>(30, 30, 5, 3, 9)
+		<< average_pooling_layer<tan_h>(26, 26, 9, 2)
+		<< convolutional_layer<tan_h>(13, 13, 5, 9, 27)
+		<< average_pooling_layer<tan_h>(9, 9, 27, 3)
+		<< convolutional_layer<tan_h>(3, 3, 3, 27, 54)
+		<< fully_connected_layer<tan_h>(54, 2);
+
+		std::cout << "load models..." << std::endl;
+
+		std::cout << "start learning" << std::endl;
+
+		progress_display disp(train_images.size());
+		timer t;
+		int minibatch_size = 10;
+
+		optimizer.alpha = alpha;
+
+		// create callback
+		auto on_enumerate_epoch = [&]() {
+			std::cout << t.elapsed() << "s elapsed." << std::endl;
+			/*tiny_dnn::result res = nn.test(train_images, train_labels);
+			std::cout << res.num_success << "/" << res.num_total << std::endl;*/
+
+			nn.save("LeNet-weights");
+			cout << "The network was saved." << endl;
+
+			disp.restart(train_images.size());
+			t.restart();
+		};
+
+		auto on_enumerate_minibatch = [&]() { disp += minibatch_size; };
+
+		// training
+		nn.train<mse>(optimizer, train_images, train_labels, minibatch_size, epoch,
+			on_enumerate_minibatch, on_enumerate_epoch);
+
+		std::cout << "end training." << std::endl;
+
+
+		// save networks
+		nn.save("LeNet-weights");
 	}
-	cout << "watch train_labels[0]" << endl;
-	cout << train_labels[0] << endl;*/
-
-	std::cout << "start learning" << std::endl;
-
-	progress_display disp(train_images.size());
-	timer t;
-	//int minibatch_size = 5000;
-
-	optimizer.alpha *= std::sqrt(minibatch_size);
-
-	// create callback
-	auto on_enumerate_epoch = [&]() {
-		std::cout << t.elapsed() << "s elapsed." << std::endl;
-		tiny_dnn::result res = nn.test(train_images, train_labels);
-		std::cout << res.num_success << "/" << res.num_total << std::endl;
-
-		disp.restart(train_images.size());
-		t.restart();
-	};
-
-	auto on_enumerate_minibatch = [&]() { disp += minibatch_size; };
-
-	// training
-	nn.train<mse>(optimizer, train_images, train_labels, minibatch_size, 20,
-		on_enumerate_minibatch, on_enumerate_epoch);
-
-	std::cout << "end training." << std::endl;
-
-
-	// save networks
-	nn.save("LeNet-weights");
 }
 
 
@@ -174,7 +226,7 @@ void load_sample(vector<vec_t>& train_images,
 		}
 		ifstream f(stream.str());
 		if (f.good()) {
-			cout << "compute " << stream.str() << endl;
+			cout << "compute " << stream.str() << "\r";
 			Mat img = imread(stream.str(), IMREAD_GRAYSCALE);
 
 			/* CelebA's size is 178*218, different from mydataset's 64*64 */
@@ -185,16 +237,17 @@ void load_sample(vector<vec_t>& train_images,
 				resize(mid, img, Size(64, 64));
 			}
 
-			convert_image(img, 1.0, 32, 32, label, train_images, train_labels);
+			convert_image(img, 1.0, 64, 64, label, train_images, train_labels);
 
 			/* Compute the mirror image *//*
 										  Mat imgmirror = imMirror(img);
 										  convert_image(imgmirror, 1.0, 32, 32, label, train_images, train_labels);*/
 		}
 		else {
-			cout << "miss: " << stream.str() << endl;
+			cout << "miss: " << stream.str() << "\r";
 		}
 	}
+	cout << endl;
 }
 
 
@@ -202,47 +255,69 @@ void convnet_test(String imgFileName, double maxv, double minv) {
 	/* Load the convolution network */
 	network<sequential> nn;
 	nn.load("LeNet-weights");
-
-	/* convert imagefile to vec_t */
-	vector<Rect> foundLocations;
-	vector<Rect> res;
-
 	Mat img = imread(imgFileName, IMREAD_GRAYSCALE);
-
+	vector<vec_t> predictions;
+	vector<Rect> candidates;
 	for (int i = 0; i < img.cols - 64; i += 8) {
 		for (int j = 0; j < img.rows - 64; j += 8) {
 			cv::Mat_<uint8_t> resized;
 			vec_t d;
 			Mat tmp = img(Rect(i, j, 64, 64));
-			cv::resize(tmp, resized, cv::Size(32, 32));
+			cv::resize(tmp, resized, cv::Size(64, 64));
 			std::transform(resized.begin(), resized.end(), std::back_inserter(d),
 				[=](uint8_t c) { return c * (maxv - minv) / 255.0 + minv; });
-			auto prediction = nn.predict(d);
-
-			cout << "cout prediction : ";
-			for (double d : prediction)
-				cout << d << "<<";
-			cout << endl;
-
-			label_t label = (prediction[0] > prediction[1] ? 0 : 1);
-
-			if (label == 1) {
-				foundLocations.push_back(Rect(i, j, 64, 64));
+			predictions.push_back(nn.predict(d));
+			if (i == 0) {
+				cout << "cout prediction : ";
+				for (double d : nn.predict(d))
+					cout << d << "<<";
+				cout << endl;
 			}
+			candidates.push_back(Rect(i, j, 64, 64));
 
 		}
 	}
+	while (1) {
+		double diff = 0, pos = -1, neg = 1;
+		int order;
+		cout << "cin order" << endl;
+		cin >> order;
+		if (order & 4) {
+			cout << "cin diff" << endl;
+			cin >> diff;
+		}
+		if (order & 2) {
+			cout << "cin pos predict should greater than : " << endl;
+			cin >> pos;
+		}
+		if (order & 1) {
+			cout << "cin neg predict should less than :" << endl;
+			cin >> neg;
+		}
 
-	/* Merge the location */
-	//res = mergeLocation(foundLocations);
+		/* convert imagefile to vec_t */
+		vector<Rect> foundLocations;
+		vector<Rect> res;
 
-	/* Display the rectangle */
-	img = imread(imgFileName);
-	Scalar GREEN = Scalar(0, 255, 0);
-	for (int i = 0; i < foundLocations.size(); i++) {
-		rectangle(img, foundLocations[i], GREEN, 2);
+		for (int i = 0; i < predictions.size(); i++) {
+			vec_t pre = predictions[i];
+			if (pre[1] - pre[0] > diff && pre[1] > pos && pre[0] < neg) {
+				foundLocations.push_back(candidates[i]);
+			}
+		}
+
+		/* Merge the location */
+		//res = mergeLocation(foundLocations);
+
+		/* Display the rectangle */
+		img = imread(imgFileName);
+		Scalar GREEN = Scalar(0, 255, 0);
+		for (int i = 0; i < foundLocations.size(); i++) {
+			rectangle(img, foundLocations[i], GREEN, 2);
+		}
+		imshow("Result", img);
+		waitKey(0);
+		destroyAllWindows();
+
 	}
-	imshow("Result", img);
-	waitKey(0);
-	destroyAllWindows();
 }

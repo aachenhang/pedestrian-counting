@@ -13,16 +13,17 @@
 using namespace std;
 
 
-#include <opencv2\highgui\highgui.hpp>
 #include <opencv2\core\core.hpp>
 #include <opencv2\objdetect\objdetect.hpp>
-#include <opencv2\ml\ml.hpp>
-#include <opencv2\imgproc\imgproc.hpp>
 using namespace cv;
-using namespace ml;
 
 #include "merge_location.h"
 #include "constants_list.h"
+#include "tiny_dnn/tiny_dnn.h"
+
+using namespace tiny_dnn;
+using namespace tiny_dnn::activation;
+using namespace tiny_dnn::layers;
 
 
 
@@ -36,4 +37,16 @@ void computeDescriptor(vector<vector<float>> &alldescriptors,
 void hog_svm_save();
 void hog_svm_load(HOGDescriptor &hog);
 void hog_svm_detect();
+
+
+void hog_svm_cnn_detect();
+
+/* Pust the output weights of the last convolution layer of cnn to svm */
+void computeDescriptor(vector<vector<float>> &alldescriptors,
+	String filepath,
+	int label,
+	int numofsample,
+	network<sequential> &nn,
+	int fillflag = 0);
+void svm_cnn_save();
 

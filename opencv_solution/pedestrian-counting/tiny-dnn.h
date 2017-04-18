@@ -1,3 +1,5 @@
+#pragma once
+
 /*
 Copyright (c) 2013, Taiga Nomi
 All rights reserved.
@@ -17,7 +19,7 @@ using namespace tiny_dnn::layers;
 
 using namespace std;
 
-void sample1_convnet(int minibatch_size);
+void sample1_convnet(float alpha = 0.01);
 void load_mydataset(vector<vec_t>& train_images, vector<label_t>& train_labels);
 void convert_image(const cv::Mat& img,
 	double scale,

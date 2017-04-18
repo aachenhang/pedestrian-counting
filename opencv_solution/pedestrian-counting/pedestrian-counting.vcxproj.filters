@@ -21,9 +21,6 @@
     <ClCompile Include="test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\Desktop\毕设论文\vibe\libvibe++\src\libvibe++\common\ViBeBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="facedetect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -47,32 +44,32 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="test.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="foreground_extract.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="benchmark.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="create_dataset.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="process.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="tiny-dnn.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="merge_location.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="constants_list.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="facedetect.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="create_dataset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="foreground_extract.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="merge_location.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="process.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="test.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tiny-dnn.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

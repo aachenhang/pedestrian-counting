@@ -5,10 +5,15 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/objdetect/objdetect.hpp>
+#include <opencv2/core/core.hpp>
+#include <tiny_dnn\tiny_dnn.h>
 
 
 using namespace std;
 using namespace cv;
+using namespace tiny_dnn;
+using namespace tiny_dnn::activation;
+using namespace tiny_dnn::layers;
 
 #include "constants_list.h"
 #include "process.h"
@@ -22,20 +27,22 @@ void getsizeofimg() {
 }
 
 void test() {
-	cout << "This is the gatedoor of testing " << endl;
-	vector<vector<float>> alldescriptors;
+	network<sequential> nn;
+	nn.load("LeNet-weights");
+	cout << nn.depth() << endl;
+	for (int i = 0; i < nn.depth(); i++) {
+		vector<tensor_t> output = nn[i]->output();
+		cout << "output size is " << output.size() << endl;
+		for (tensor_t &tensor : output) {
+			cout << "tensor size is" << tensor.size() << endl;
+			for (vec_t &vec : tensor) {
+				cout << "vec size is" << vec.size() << endl;
+				for (float f : vec) {
+					cout << f << "<<";
+				}
+				cout << endl;
+			}
+		}
 
-	/* Initial the HOGDescriptor */
-	Size winsize(64, 64), blocksize(16, 16), blockstep(8, 8), cellsize(8, 8);
-	int nbins = 9;
-	HOGDescriptor hog(winsize, blocksize, blockstep, cellsize, nbins);
-	
-	computeDescriptor(alldescriptors,
-		positive_samples_file,
-		1,
-		positive_num,
-		hog);
-
-	cout << alldescriptors.size() << endl;
-	cout << alldescriptors[0].size() << endl;
+	}
 }

@@ -1,15 +1,5 @@
 #include <iostream>
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/objdetect/objdetect.hpp>
-#include <opencv2/ml/ml.hpp>
-
-using namespace cv;
-using namespace std;
-#include <mat.h>
-#include <time.h>
 
 #include "foreground_extract.h"
 #include "benchmark.h"
@@ -19,6 +9,9 @@ using namespace std;
 #include "tiny-dnn.h"
 #include "facedetect.h"
 #include "constants_list.h"
+
+using namespace cv;
+using namespace std;
 
 void print_help() {
 	cout << "*****************************************************************************" << endl;
@@ -39,6 +32,8 @@ void print_help() {
 	cout << "t : convnet_test(), cal the cnn testing" << endl;
 	cout << "f : facedetect_main(), cal the interal function to detect face" << endl;
 	cout << "T : test(), the gatedoor of testing" << endl;
+	cout << "C : hog_svm_cnn_detect(), at first hog_svm detect and then cnn verify" << endl;
+	cout << "S : svm_cnn_save(), move the last layer input to SVM to make a training" << endl;
 	cout << "h : print_help()" << endl;
 	cout << "q : quit" << endl;
 }
@@ -48,6 +43,7 @@ int main(int argc, char** argv) {
 		cout << "/*******select the function:*******/" << endl;
 		char c;
 		int inputnum;
+		float inputfloat;
 		int sum;
 		string inputstr;
 		stringstream stream;
@@ -97,9 +93,7 @@ int main(int argc, char** argv) {
 			createHardSample();
 			break;
 		case 'v':
-			cout << "input the minibatch: " << endl;
-			cin >> inputnum;
-			sample1_convnet(inputnum);
+			sample1_convnet();
 			break;
 		case 't':
 			convnet_test();
@@ -124,6 +118,12 @@ int main(int argc, char** argv) {
 			break;
 		case 'T':
 			test();
+			break;
+		case 'C':
+			hog_svm_cnn_detect();
+			break;
+		case 'S':
+			svm_cnn_save();
 			break;
 		case 'q':
 			return 0;

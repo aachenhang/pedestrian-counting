@@ -1,3 +1,5 @@
+#pragma once
+
 #include <opencv2\core.hpp>
 
 using namespace cv;
@@ -9,6 +11,7 @@ extern String negative_hard_samples_file;
 extern String CelebA_dataset_file;
 //extern String svm_file;
 extern String svm_file;
+extern String svm_cnn_file;
 extern String image_test_file;
 extern int const positive_num;
 extern int const negative_num;
