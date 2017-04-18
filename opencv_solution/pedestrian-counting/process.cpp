@@ -129,6 +129,7 @@ void hog_svm_save() {
 
 	/* Compute the negative hard samples */
 	computeDescriptor(alldescriptors, negative_hard_samples_file, -1, negative_hard_num, hog);
+	cout << "descriptors number: " << alldescriptors.size() << endl;
 
 	/* Set the featureMat and labelMat */
 	int rows = alldescriptors.size();
@@ -158,11 +159,11 @@ void hog_svm_save() {
 }
 
 
-void hog_svm_load(HOGDescriptor &hog) {
+void hog_svm_load(HOGDescriptor &hog, String file) {
 
 	/* Load the svm */
-	Ptr<SVM> svm = SVM::load(svm_file);
-	cout << "load: " << svm_file << endl;
+	Ptr<SVM> svm = SVM::load(file);
+	cout << "load: " << file << endl;
 
 	/* Get alpha and rho */
 	Mat supportVector = svm->getSupportVectors();
@@ -457,6 +458,7 @@ void svm_cnn_save() {
 
 	/* Compute the negative hard samples */
 	computeDescriptor(alldescriptors, negative_hard_samples_file, -1, negative_hard_num, nn);
+	cout << "descriptors number: " << alldescriptors.size() << endl;
 
 	/* Set the featureMat and labelMat */
 	int rows = alldescriptors.size();
@@ -486,3 +488,79 @@ void svm_cnn_save() {
 }
 
 
+void svm_cnn_detect() {
+	/* Load the hog detector */
+	Size winsize(64, 64), blocksize(16, 16), blockstep(8, 8), cellsize(8, 8);
+	int nbins = 9;
+	HOGDescriptor hog(winsize, blocksize, blockstep, cellsize, nbins);
+	hog_svm_load(hog);
+
+
+	/* Load the svm_cnn */
+	Ptr<SVM> svm_cnn = SVM::create();
+	svm_cnn->setType(SVM::C_SVC);
+	svm_cnn->setC(0.01);
+	svm_cnn->setKernel(SVM::LINEAR);
+	svm_cnn->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER, 3000, 1e-6));
+	svm_cnn->load(svm_cnn_file);
+
+	/* Load the CNN */
+	network<sequential> nn;
+	nn.load("LeNet-weights");
+
+	while (1) {
+		/* Detect the image */
+		Mat img = imread(image_test_file);
+		Mat imgGrey = imread(image_test_file, IMREAD_GRAYSCALE);
+		vector<Rect> foundLocations;
+		double hitThreshold = 10.0;
+		cin >> hitThreshold;
+		if (hitThreshold == 0)	break;
+		Size winStride(8, 8);
+		Size padding(0, 0);
+		double scale = 1.05;
+		double finalThreshold = 100.0;
+		cin >> finalThreshold;
+		bool useMeanshiftGrouping = false;
+		hog.detectMultiScale(img, foundLocations, hitThreshold, winStride, padding, finalThreshold, useMeanshiftGrouping);
+
+		/* Merge the locations */
+		vector<Rect> mergedLocations = mergeLocation(foundLocations);
+
+
+		vector<Rect> res;
+		for (Rect rect : mergedLocations) {
+			Mat tmp = img(rect);
+			cv::Mat_<uint8_t> resized;
+			vec_t d;
+			cv::resize(tmp, resized, cv::Size(64, 64));
+			std::transform(resized.begin(), resized.end(), std::back_inserter(d),
+				[=](uint8_t c) { return c * (1.0f - (-1.0f)) / 255.0 + (-1.0f); });
+			nn.predict(d);
+			int cols = nn[nn.depth() - 2]->output().front().front().size();
+			Mat featureMat(1, cols, CV_32FC1);
+			for (int j = 0; j < cols; j++) {
+				featureMat.at<float>(0, j) = nn[nn.depth() - 2]->output().front().front().at(j);
+			}
+			if (svm_cnn->predict(featureMat, res) == 1) {
+				res.push_back(rect);
+			}
+		}
+
+		/* Print the locations */
+		sort(res.begin(), res.end(), cmp);
+		for (Rect rect : res) {
+			cout << rect.x << " " << rect.y << endl;
+		}
+
+		/* Display the rectangle */
+		Scalar GREEN = Scalar(0, 255, 0);
+		for (int i = 0; i < res.size(); i++) {
+			rectangle(img, res[i], GREEN, 2);
+		}
+		imshow("Result", img);
+		waitKey(0);
+		imwrite("Result.jpg", img);
+		destroyAllWindows();
+	}
+}

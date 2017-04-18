@@ -35,7 +35,7 @@ void computeDescriptor(vector<vector<float>> &alldescriptors,
 					   HOGDescriptor &hog,
 					   int fillflag = 0);
 void hog_svm_save();
-void hog_svm_load(HOGDescriptor &hog);
+void hog_svm_load(HOGDescriptor &hog, String file = svm_file);
 void hog_svm_detect();
 
 
@@ -49,4 +49,5 @@ void computeDescriptor(vector<vector<float>> &alldescriptors,
 	network<sequential> &nn,
 	int fillflag = 0);
 void svm_cnn_save();
+void svm_cnn_detect();
 
