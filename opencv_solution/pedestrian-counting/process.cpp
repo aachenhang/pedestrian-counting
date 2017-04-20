@@ -408,16 +408,33 @@ static void computeDescriptor(vector<vector<float>> &alldescriptors,
 				[=](uint8_t c) { return c * (1.0f - (-1.0f)) / 255.0 + (-1.0f); });
 			nn.predict(d);
 			/* print the struction of nn */
-			for (int layer = 0; layer < nn.depth(); layer++) {
-				cout << "This is layer of " << layer << endl;
-				for (float f : nn[layer]->output().front().front()) {
-					cout << f << " ";
-				}
-			}
+			//for (int layerIdx = 0; layerIdx < nn.depth(); layerIdx++) {
+			//	cout << "This is the layer of " << layerIdx << endl;
+			//	vector<tensor_t> output = nn[layerIdx]->output();
+			//	for (int tensorIdx = 0; tensorIdx < output.size(); tensorIdx++) {
+			//		cout << "This is the tensor of " << tensorIdx << endl;
+			//		/* cout the tensor */
+			//		for (vec_t vec : output[tensorIdx]) {
+			//			for (float f : vec) {
+			//				cout << f << " ";
+			//			}
+			//			cout << endl << endl;
+			//		}
+			//	}
+			//}
 
-			for (float f : nn[nn.depth() - 2]->output().front().front()) {
+			vec_t vec = nn[nn.depth() - 2]->output().front().front();
+			//cout << "vec.size() = " << vec.size() << endl;
+			for (float f : vec) {
 				descriptors.push_back(f);
 			}
+
+			/*cout << "This is the float in the descriptors" << endl;
+			for (float f : descriptors) {
+				cout << f << " ";
+			}
+			cout << endl;*/
+
 			descriptors.push_back(label);
 			alldescriptors.push_back(descriptors);
 
@@ -476,6 +493,7 @@ void svm_cnn_save() {
 	/* Compute the negative hard samples */
 	computeDescriptor(alldescriptors, negative_hard_samples_file, -1, negative_hard_num, nn);
 	cout << "descriptors number: " << alldescriptors.size() << endl;
+
 
 	/* Set the featureMat and labelMat */
 	int rows = alldescriptors.size();
