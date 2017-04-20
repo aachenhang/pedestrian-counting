@@ -1,23 +1,14 @@
-#include <iostream>
-#include <vector>
+#include "stdafx.h"
 
-
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/objdetect/objdetect.hpp>
-#include <opencv2/core/core.hpp>
-#include <tiny_dnn\tiny_dnn.h>
 
 
 using namespace std;
 using namespace cv;
+
+#include "constants_list.h"
 using namespace tiny_dnn;
 using namespace tiny_dnn::activation;
 using namespace tiny_dnn::layers;
-
-#include "constants_list.h"
-#include "process.h"
-
 
 void getsizeofimg() {
 
@@ -29,20 +20,29 @@ void getsizeofimg() {
 void test() {
 	network<sequential> nn;
 	nn.load("LeNet-weights");
-	cout << nn.depth() << endl;
-	for (int i = 0; i < nn.depth(); i++) {
-		vector<tensor_t> output = nn[i]->output();
-		cout << "output size is " << output.size() << endl;
-		for (tensor_t &tensor : output) {
-			cout << "tensor size is" << tensor.size() << endl;
-			for (vec_t &vec : tensor) {
-				cout << "vec size is" << vec.size() << endl;
+
+	cv::Mat_<uint8_t> resized;
+	vec_t d;
+	Mat tmp = imread("F:/Downloads/mydataset/positive_sample/0.jpg", IMREAD_GRAYSCALE);
+	cv::resize(tmp, resized, cv::Size(64, 64));
+	std::transform(resized.begin(), resized.end(), std::back_inserter(d),
+		[=](uint8_t c) { return c * (1.0f - (-1.0f)) / 255.0 + (-1.0f); });
+
+	nn.predict(d);
+
+	for (int layerIdx = 0; layerIdx < nn.depth(); layerIdx++) {
+		cout << "This is the layer of " << layerIdx << endl;
+		vector<tensor_t> output = nn[layerIdx]->output();
+		for (int tensorIdx = 0; tensorIdx < output.size(); tensorIdx++) {
+			cout << "This is the tensor of " << tensorIdx << endl;
+			/* cout the tensor */
+			for (vec_t vec : output[tensorIdx]) {
 				for (float f : vec) {
-					cout << f << "<<";
+					cout << f << " ";
 				}
-				cout << endl;
+				cout << endl << endl;
 			}
 		}
-
 	}
+
 }

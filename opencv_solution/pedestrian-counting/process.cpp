@@ -5,7 +5,8 @@ This file contains the cascade about the all process.
 /**********************************************************/
 
 
-#include <iostream>
+#include "stdafx.h"
+#include "process.h"
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
@@ -13,22 +14,29 @@ This file contains the cascade about the all process.
 using namespace std;
 
 
-#include <opencv2\highgui\highgui.hpp>
-#include <opencv2\core\core.hpp>
-#include <opencv2\objdetect\objdetect.hpp>
-#include <opencv2\ml\ml.hpp>
-#include <opencv2\imgproc\imgproc.hpp>
 using namespace cv;
 using namespace ml;
 
 #include "merge_location.h"
 #include "constants_list.h"
-#include "process.h"
+#include "facedetect.h"
 using namespace tiny_dnn;
 using namespace tiny_dnn::activation;
 using namespace tiny_dnn::layers;
 
-
+static void hog_svm_load(HOGDescriptor &hog, String file = svm_file);
+static void computeDescriptor(vector<vector<float>> &alldescriptors,
+	String filepath,
+	int label,
+	int numofsample,
+	HOGDescriptor &hog,
+	int fillflag = 0);
+static void computeDescriptor(vector<vector<float>> &alldescriptors,
+	String filepath,
+	int label,
+	int numofsample,
+	network<sequential> &nn,
+	int fillflag = 0);
 
 Mat imMirror(Mat img) {
 	Mat dst(img.size(), img.type());
@@ -45,7 +53,7 @@ Mat imMirror(Mat img) {
 }
 
 
-void computeDescriptor(vector<vector<float>> &alldescriptors,
+static void computeDescriptor(vector<vector<float>> &alldescriptors,
 						String filepath,
 						int label,
 						int numofsample,
@@ -159,7 +167,7 @@ void hog_svm_save() {
 }
 
 
-void hog_svm_load(HOGDescriptor &hog, String file) {
+static void hog_svm_load(HOGDescriptor &hog, String file) {
 
 	/* Load the svm */
 	Ptr<SVM> svm = SVM::load(file);
@@ -358,6 +366,7 @@ void hog_svm_cnn_detect() {
 			imshow("Result", img);
 			cout << "SVM found:" << res.size() << endl;
 			cout << "CNN found:" << foundLocations.size() << endl;
+			cout << "CNN found Not:" << notFoundLocations.size() << endl;
 			waitKey(0);
 			imwrite("Result.jpg", img);
 			destroyAllWindows();
@@ -366,12 +375,12 @@ void hog_svm_cnn_detect() {
 }
 
 
-void computeDescriptor(vector<vector<float>> &alldescriptors,
+static void computeDescriptor(vector<vector<float>> &alldescriptors,
 					String filepath,
 					int label,
 					int numofsample,
 					network<sequential> &nn,
-					int fillflag) 
+					int fillflag)
 {
 	for (int i = 0; i <= numofsample; i++) {
 		vector<float> descriptors, mirrordescriptors;
@@ -398,19 +407,27 @@ void computeDescriptor(vector<vector<float>> &alldescriptors,
 			std::transform(resized.begin(), resized.end(), std::back_inserter(d),
 				[=](uint8_t c) { return c * (1.0f - (-1.0f)) / 255.0 + (-1.0f); });
 			nn.predict(d);
+			/* print the struction of nn */
+			for (int layer = 0; layer < nn.depth(); layer++) {
+				cout << "This is layer of " << layer << endl;
+				for (float f : nn[layer]->output().front().front()) {
+					cout << f << " ";
+				}
+			}
+
 			for (float f : nn[nn.depth() - 2]->output().front().front()) {
 				descriptors.push_back(f);
 			}
 			descriptors.push_back(label);
 			alldescriptors.push_back(descriptors);
 
-			/* Compute the mirror image */
-			Mat imgmirror = imMirror(imgGrey);
-			for (float f : nn[nn.depth() - 2]->output().front().front()) {
-				mirrordescriptors.push_back(f);
-			}
-			mirrordescriptors.push_back(label);
-			alldescriptors.push_back(mirrordescriptors);
+			///* Compute the mirror image */
+			//Mat imgmirror = imMirror(imgGrey);
+			//for (float f : nn[nn.depth() - 2]->output().front().front()) {
+			//	mirrordescriptors.push_back(f);
+			//}
+			//mirrordescriptors.push_back(label);
+			//alldescriptors.push_back(mirrordescriptors);
 		}
 		else {
 			cout << "miss: " << stream.str() << endl;
@@ -558,6 +575,74 @@ void svm_cnn_detect() {
 		for (int i = 0; i < res.size(); i++) {
 			rectangle(img, res[i], GREEN, 2);
 		}
+		imshow("Result", img);
+		waitKey(0);
+		imwrite("Result.jpg", img);
+		destroyAllWindows();
+	}
+}
+
+
+void svm_lbp_detect() {
+	/* Load the hog detector */
+	Size winsize(64, 64), blocksize(16, 16), blockstep(8, 8), cellsize(8, 8);
+	int nbins = 9;
+	HOGDescriptor hog(winsize, blocksize, blockstep, cellsize, nbins);
+	hog_svm_load(hog);
+	while (1) {
+		/* Detect the image */
+		Mat img = imread(image_test_file);
+		Mat imgGrey = imread(image_test_file, IMREAD_GRAYSCALE);
+		vector<Rect> foundLocations;
+		double hitThreshold = 10.0;
+		cout << "cin hitThreshold & finalThreshold" << endl;
+		cin >> hitThreshold;
+		if (hitThreshold == 0)	break;
+		Size winStride(8, 8);
+		Size padding(0, 0);
+		double scale = 1.05;
+		double finalThreshold = 100.0;
+		cin >> finalThreshold;
+		bool useMeanshiftGrouping = false;
+		hog.detectMultiScale(img, foundLocations, hitThreshold, winStride, padding, finalThreshold, useMeanshiftGrouping);
+
+
+
+		///* Print the locations */
+		//sort(res.begin(), res.end(), cmp);
+		//for (Rect rect : res) {
+		//	cout << rect.x << " " << rect.y << endl;
+		//}
+
+		cout << "input the argv: " << endl;
+		getchar();
+		string inputstr;
+		stringstream stream;
+		getline(cin, inputstr);
+		stream.str(inputstr);
+
+		char** _argv = new char*[10];
+		int _argc = 0;
+		while (!stream.eof()) {
+			char* str = new char[105];
+			stream >> str;
+			_argv[_argc++] = str;
+		}
+		vector<Rect> lbpRes = facedetect_main(_argc, _argv);
+		delete[] _argv;
+		
+		for (Rect &rect : lbpRes) {
+			foundLocations.push_back(rect);
+		}
+		vector<Rect> res = mergeLocation(foundLocations);
+
+		/* Display the rectangle */
+		Scalar GREEN = Scalar(0, 255, 0);
+		Scalar RED = Scalar(32, 85, 234);
+		for (int i = 0; i < res.size(); i++) {
+			rectangle(img, res[i], GREEN, 2);
+		}
+		cout << "result size: " << res.size() << endl;
 		imshow("Result", img);
 		waitKey(0);
 		imwrite("Result.jpg", img);

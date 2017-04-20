@@ -35,6 +35,7 @@ void print_help() {
 	cout << "C : hog_svm_cnn_detect(), at first hog_svm detect and then cnn verify" << endl;
 	cout << "S : svm_cnn_save(), move the last layer input to SVM to make a training" << endl;
 	cout << "D : svm_cnn_detect(), cal the svm_cnn testing" << endl;
+	cout << "L : void svm_lbp_detect(), cal the svm_lbp detecting" << endl;
 	cout << "h : print_help()" << endl;
 	cout << "q : quit" << endl;
 }
@@ -128,6 +129,9 @@ int main(int argc, char** argv) {
 			break;
 		case 'D':
 			svm_cnn_detect();
+			break;
+		case 'L':
+			svm_lbp_detect();
 			break;
 		case 'q':
 			return 0;

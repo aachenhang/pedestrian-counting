@@ -1,8 +1,4 @@
-#include "opencv2/imgproc.hpp"
-#include <ctime>
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/video/background_segm.hpp>
+#include "stdafx.h"
 
 using namespace cv;
 int mog2(char* video) {

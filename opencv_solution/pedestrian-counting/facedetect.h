@@ -1,16 +1,11 @@
 #pragma once
 
-#include "opencv2/objdetect.hpp"
-#include "opencv2/highgui.hpp"
-#include "opencv2/imgproc.hpp"
-#include <iostream>
-
+#include "opencv2\core\types.hpp"
+#include <vector>
 using namespace std;
 using namespace cv;
 
 static void help();
-void detectAndDraw(Mat& img, CascadeClassifier& cascade,
-	CascadeClassifier& nestedCascade,
-	double scale, bool tryflip);
 
-int facedetect_main(int argc = 0, char** argv = NULL);
+
+vector<Rect> facedetect_main(int argc = 0, char** argv = NULL);

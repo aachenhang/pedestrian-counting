@@ -1,8 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <iostream>
-#include <opencv2\imgproc.hpp>
+#include "opencv2\core\types.hpp"
 
 using namespace std;
 using namespace cv;

@@ -6,15 +6,10 @@ All rights reserved.
 Use of this source code is governed by a BSD-style license that can be found
 in the LICENSE file.
 */
-#include <algorithm>
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include <opencv2/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include "tiny_dnn/tiny_dnn.h"
+#include "stdafx.h"
 #include "process.h"
+
+
 #include "merge_location.h"
 #include "constants_list.h"
 #include "tiny-dnn.h"
@@ -25,6 +20,24 @@ using namespace tiny_dnn::layers;
 
 using namespace std;
 using namespace cv;
+
+static void convert_image(const cv::Mat& img,
+	double scale,
+	int w,
+	int h,
+	label_t label,
+	std::vector<vec_t>& data,
+	std::vector<label_t>& labels,
+	double minv,
+	double maxv);
+static void load_mydataset(vector<vec_t>& train_images, vector<label_t>& train_labels);
+
+static void load_sample(vector<vec_t>& train_images,
+	vector<label_t>& train_labels,
+	string filepath,
+	int label,
+	int numofsample,
+	int fillflag = 0);
 
 ///////////////////////////////////////////////////////////////////////////////
 // learning convolutional neural networks (LeNet-5 like architecture)
@@ -164,7 +177,7 @@ void sample1_convnet(float alpha) {
 
 
 // convert image to vec_t
-void convert_image(const cv::Mat& img,
+static void convert_image(const cv::Mat& img,
 	double scale,
 	int w,
 	int h,
@@ -185,7 +198,7 @@ void convert_image(const cv::Mat& img,
 }
 
 
-void load_mydataset(vector<vec_t>& train_images, vector<label_t>& train_labels) {
+static void load_mydataset(vector<vec_t>& train_images, vector<label_t>& train_labels) {
 	/* Compute the positive samples from my dataset */
 	load_sample(train_images, train_labels, positive_samples_file, 1, positive_num);
 	cout << "images number: " << train_images.size() << endl;
@@ -209,7 +222,7 @@ void load_mydataset(vector<vec_t>& train_images, vector<label_t>& train_labels) 
 }
 
 
-void load_sample(vector<vec_t>& train_images,
+static void load_sample(vector<vec_t>& train_images,
 	vector<label_t>& train_labels,
 	string filepath,
 	int label,
