@@ -27,6 +27,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cnnlayer2txt", "cnnlayer2tx
 		{1D8A4E26-C946-48E4-B83F-51EE11B51DEA} = {1D8A4E26-C946-48E4-B83F-51EE11B51DEA}
 	EndProjectSection
 EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "cnntensorflow", "tensorflow\cnntensorflow.pyproj", "{ED209DC2-F15A-4B88-AD71-1E4F426528DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,12 @@ Global
 		{8A09DC52-7369-44DC-ACD3-21469FE364C3}.Release|x64.Build.0 = Release|x64
 		{8A09DC52-7369-44DC-ACD3-21469FE364C3}.Release|x86.ActiveCfg = Release|Win32
 		{8A09DC52-7369-44DC-ACD3-21469FE364C3}.Release|x86.Build.0 = Release|Win32
+		{ED209DC2-F15A-4B88-AD71-1E4F426528DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED209DC2-F15A-4B88-AD71-1E4F426528DF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ED209DC2-F15A-4B88-AD71-1E4F426528DF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ED209DC2-F15A-4B88-AD71-1E4F426528DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED209DC2-F15A-4B88-AD71-1E4F426528DF}.Release|x64.ActiveCfg = Release|Any CPU
+		{ED209DC2-F15A-4B88-AD71-1E4F426528DF}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

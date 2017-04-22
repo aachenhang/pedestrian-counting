@@ -23,7 +23,7 @@ void svm_cnn_save() {
 	Ptr<SVM> svm = SVM::create();
 	svm->setType(SVM::C_SVC);
 	svm->setC(0.01);
-	svm->setKernel(SVM::LINEAR);
+	svm->setKernel(SVM::RBF);
 	svm->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER, 3000, 1e-6));
 
 	/* Load featureMat and labelMat */
