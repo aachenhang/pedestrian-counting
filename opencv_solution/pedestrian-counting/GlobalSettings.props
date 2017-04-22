@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>H:\Downloads\opencv\build\include;C:\Users\aachenhang\Source\Repos\tiny-dnn;C:\Users\aachenhang\Source\Repos\pedestrian-counting\opencv_solution\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalUsingDirectories>H:\Downloads\opencv\build\include;C:\Users\aachenhang\Source\Repos\tiny-dnn;C:\Users\aachenhang\Source\Repos\pedestrian-counting\opencv_solution\common</AdditionalUsingDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>H:\Downloads\opencv\build\x64\vc14\lib;C:\Users\aachenhang\Source\Repos\pedestrian-counting\opencv_solution\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_world320.lib;opencv_world320d.lib;common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>

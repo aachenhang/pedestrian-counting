@@ -515,6 +515,7 @@ void svm_cnn_save() {
 	/* Train the svm */
 	cout << "Trainning starting..." << endl;
 	start = time(NULL);
+	cout << "The varCount is " << cols << endl;
 	svm->train(featureMat, ROW_SAMPLE, labelMat);
 	svm->save(svm_cnn_file);
 	end = time(NULL);
@@ -538,6 +539,10 @@ void svm_cnn_detect() {
 	svm_cnn->setKernel(SVM::LINEAR);
 	svm_cnn->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER, 3000, 1e-6));
 	svm_cnn->load(svm_cnn_file);
+	cout << "load: " << svm_cnn_file << endl;
+
+	cout << "cout the feature of sum_cnn: " << endl;
+	cout << "varcount is : " << svm_cnn->getVarCount() << endl;
 
 	/* Load the CNN */
 	network<sequential> nn;
@@ -565,19 +570,21 @@ void svm_cnn_detect() {
 
 		vector<Rect> res;
 		for (Rect rect : mergedLocations) {
-			Mat tmp = img(rect);
+			Mat tmp = imgGrey(rect);
 			cv::Mat_<uint8_t> resized;
 			vec_t d;
 			cv::resize(tmp, resized, cv::Size(64, 64));
 			std::transform(resized.begin(), resized.end(), std::back_inserter(d),
 				[=](uint8_t c) { return c * (1.0f - (-1.0f)) / 255.0 + (-1.0f); });
 			nn.predict(d);
-			int cols = nn[nn.depth() - 2]->output().front().front().size();
+			vec_t vec = nn[nn.depth() - 2]->output().front().front();
+			int cols = vec.size();
 			Mat featureMat(1, cols, CV_32FC1);
 			for (int j = 0; j < cols; j++) {
-				featureMat.at<float>(0, j) = nn[nn.depth() - 2]->output().front().front().at(j);
+				float f = vec[j];
+				featureMat.at<float>(0, j) = f;
 			}
-			if (svm_cnn->predict(featureMat, res) == 1) {
+			if (svm_cnn->predict(featureMat) == 1) {
 				res.push_back(rect);
 			}
 		}

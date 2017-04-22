@@ -331,6 +331,7 @@ void convnet_test(String imgFileName, double maxv, double minv) {
 		imshow("Result", img);
 		waitKey(0);
 		destroyAllWindows();
+		cout << endl;
 
 	}
 }
