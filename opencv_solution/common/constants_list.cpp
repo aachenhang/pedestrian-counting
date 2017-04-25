@@ -19,6 +19,10 @@ COMMONHEADER_API String svm_cnn_file = "F:/Downloads/mydataset/svm_cnn.xml";
 COMMONHEADER_API String image_test_file = "F:/Downloads/mydataset/34.jpg";
 extern COMMONHEADER_API String NN_FILE = "H:/Pro/NN_Model/LeNet-weights";
 extern COMMONHEADER_API String NN_LAYER_INFROMATION_FILE = "H:/Pro/NN_Model/NN_LAYER.txt";
+extern COMMONHEADER_API String ALL_IMAGE_FILE = "H:/Pro/NN_Model/ALL_IMAGE_FILE.txt";
+extern COMMONHEADER_API String TINY_ALL_IMAGE_FILE = "H:/Pro/NN_Model/TINY_ALL_IMAGE_FILE.txt";
+/* convolution neural network model file address */
+extern COMMONHEADER_API String CNN_MODEL_TMP = "H:/Pro/tmp/cnn_model";
 extern COMMONHEADER_API int const positive_num = 2020;
 extern COMMONHEADER_API int const negative_num = 25000;
 extern COMMONHEADER_API int const CelebA_num = 202599;

@@ -79,7 +79,9 @@ void svm_cnn_detect() {
 		/* Merge the locations */
 		vector<Rect> mergedLocations = mergeLocation(foundLocations);
 
-
+		cout << "cin the svm predict threshold " << endl;
+		float svmThreshold = 0;
+		cin >> svmThreshold;
 		vector<Rect> res, notFound;
 		for (Rect rect : mergedLocations) {
 			Mat tmp = imgGrey(rect);
@@ -96,7 +98,7 @@ void svm_cnn_detect() {
 				float f = vec[j];
 				featureMat.at<float>(0, j) = f;
 			}
-			if (svm_cnn->predict(featureMat) == 1) {
+			if (svm_cnn->predict(featureMat) >= svmThreshold) {
 				res.push_back(rect);
 			} else {
 				notFound.push_back(rect);

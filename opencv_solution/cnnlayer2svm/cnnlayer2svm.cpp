@@ -23,8 +23,8 @@ void svm_cnn_save() {
 	Ptr<SVM> svm = SVM::create();
 	svm->setType(SVM::C_SVC);
 	svm->setC(0.01);
-	svm->setKernel(SVM::RBF);
-	svm->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER, 3000, 1e-6));
+	svm->setKernel(SVM::LINEAR);
+	svm->setTermCriteria(TermCriteria(TermCriteria::MAX_ITER, 10000, 1e-6));
 
 	/* Load featureMat and labelMat */
 	FileStorage file(NN_LAYER_INFROMATION_FILE, FileStorage::READ);
@@ -44,7 +44,6 @@ void svm_cnn_save() {
 	/* Train the svm */
 	cout << "Trainning starting..." << endl;
 	start = time(NULL);
-	cout << "The varCount is " << svm->getVarCount() << endl;
 	svm->train(featureMat, ROW_SAMPLE, labelMat);
 	svm->save(svm_cnn_file);
 	end = time(NULL);
