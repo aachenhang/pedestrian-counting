@@ -13,9 +13,15 @@ using namespace ml;
 String imgfilename = "F:/Downloads/mydataset/1.jpg";
 String videofilename = "F:/Downloads/8116_IP_segment_0.mp4";
 String windowname = "makeAnnotation";
-fstream f("F:/Downloads/mydataset/1.txt", ios::out | ios::in);
+fstream f;
 Scalar GREEN = Scalar(0, 255, 0);
 const int rectanglesize = 64;
+static vector<pair<int,int>> annotations;
+static Mat makeAnnotationOriginImage;
+/* Load the hog detector */
+static Size winsize(64, 64), blocksize(16, 16), blockstep(8, 8), cellsize(8, 8);
+static int nbins = 9;
+static HOGDescriptor hog(winsize, blocksize, blockstep, cellsize, nbins);
 
 void mouseClick(int event, int x, int y, int flags, void* userdata) {
 	Mat* imgptr = (Mat*)userdata;
@@ -25,13 +31,94 @@ void mouseClick(int event, int x, int y, int flags, void* userdata) {
 		if (rectanglesize / 2 <= x && x <= imgptr->cols - rectanglesize / 2 && rectanglesize / 2 <= y && y <= imgptr->rows - rectanglesize / 2) {
 			rectangle(*imgptr, Rect(x - rectanglesize / 2, y - rectanglesize / 2, rectanglesize, rectanglesize), GREEN, 2);
 			imshow(windowname, *imgptr);
-			f << x << " " << y << endl;
+			cout << x << " " << y << endl;
+			annotations.push_back(make_pair(x, y));
 		}
+		break;
+	case EVENT_RBUTTONDOWN:
+		for (auto it = annotations.begin(); it != annotations.end(); it++) {
+			int tmpX = (*it).first;
+			int tmpY = (*it).second;
+			if (abs(tmpX - x) <= 32 && abs(tmpY - y) <= 32) {
+				annotations.erase(it);
+				it--;
+			}
+		}
+		*imgptr = imread(imgfilename);
+		for (pair<int, int> p : annotations) {
+			rectangle(*imgptr, Rect(p.first - rectanglesize / 2, p.second - rectanglesize / 2, rectanglesize, rectanglesize), GREEN, 2);
+		}
+		imshow(windowname, *imgptr);
 		break;
 	default:
 		break;
 	}
 }
+
+
+static void hog_svm_load() {
+	static int loaded = 0;
+	if (loaded == 1) {
+		cout << "HOG had been loaded" << endl;
+		return;
+	}
+
+	/* Load the svm */
+	Ptr<SVM> svm = SVM::load(svm_file);
+	cout << "load: " << svm_file << endl;
+
+	/* Get alpha and rho */
+	Mat supportVector = svm->getSupportVectors();
+	int alpharows = supportVector.rows;
+	int alphacols = svm->getVarCount();
+	Mat alpha(alpharows, alphacols, CV_32F);
+	Mat svindex(1, alpharows, CV_64F);
+	double rho = svm->getDecisionFunction(0, alpha, svindex);
+	alpha.convertTo(alpha, CV_32F);
+
+	/* Get the result Mat */
+	Mat result = -1 * alpha * supportVector;
+
+	/* Get the detector vector */
+	vector<float> detector;
+	CV_Assert(result.cols > 100);
+	for (int i = 0; i < result.cols; i++) {
+		detector.push_back(result.at<float>(0, i));
+	}
+
+	/* Load the hog detector */
+	hog.setSVMDetector(detector);
+	cout << "load: HOGDescriptor" << endl;
+	loaded++;
+}
+
+static void auto_annotation() {
+	hog_svm_load();
+	/* Detect the image */
+	vector<Rect> foundLocations;
+	double hitThreshold = 2;
+	Size winStride(8, 8);
+	Size padding(0, 0);
+	double scale = 1.05;
+	double finalThreshold = 10;
+	bool useMeanshiftGrouping = false;
+	hog.detectMultiScale(makeAnnotationOriginImage, foundLocations, hitThreshold, winStride, padding, finalThreshold, useMeanshiftGrouping);
+
+	/* Merge the locations */
+	vector<Rect> res = mergeLocation(foundLocations);
+
+
+	/* Print the locations */
+	sort(res.begin(), res.end(), cmp);
+	for (Rect rect : res) {
+		cout << rect.x << " " << rect.y << endl;
+	}
+	cout << "Push annotations" << endl;
+	for (Rect rect : res) {
+		annotations.push_back(make_pair(rect.x + 32, rect.y + 32));
+	}
+}
+
 
 
 int makeAnnotation(int inputnum) {
@@ -41,14 +128,25 @@ int makeAnnotation(int inputnum) {
 	tmpstream << "F:/Downloads/mydataset/" << inputnum << ".jpg";
 	imgfilename = tmpstream.str();
 	cout << imgfilename << endl;
+
 	Mat img = imread(imgfilename);
+	makeAnnotationOriginImage = imread(imgfilename);
 	tmpstream.str("");
 	tmpstream << "F:/Downloads/mydataset/" << inputnum << ".txt";
-	f = fstream(tmpstream.str(), ios::out);
+	fstream annotationFile = fstream(tmpstream.str(), ios::out);
 
-	char c;
+	annotations.clear();
+	/* Auto annotation */
+	auto_annotation();
+	img = imread(imgfilename);
+	for (pair<int, int> p : annotations) {
+		rectangle(img, Rect(p.first - rectanglesize / 2, p.second - rectanglesize / 2, rectanglesize, rectanglesize), GREEN, 2);
+	}
 	namedWindow(windowname);
 	setMouseCallback(windowname, mouseClick, &img);
+
+
+	char c;
 	while (1) {
 		imshow(windowname, img);
 		c = waitKey(0);
@@ -59,6 +157,13 @@ int makeAnnotation(int inputnum) {
 	}
 	f.close();
 	destroyAllWindows();
+
+	/* Write annatation file */
+	for (pair<int, int> p : annotations) {
+		annotationFile << p.first << " " << p.second << endl;
+	}
+	annotationFile.close();
+	cout << "save£º" << tmpstream.str() << endl;
 	return 0;
 }
 

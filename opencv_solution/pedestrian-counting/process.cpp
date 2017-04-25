@@ -205,9 +205,17 @@ void hog_svm_detect() {
 	int nbins = 9;
 	HOGDescriptor hog(winsize, blocksize, blockstep, cellsize, nbins);
 	hog_svm_load(hog);
+	String detect_file = "F:/Downloads/mydataset/34.jpg";
+	cout << "cin the offset : F:/Downloads/mydataset/[offset].jpg" << endl;
+	int tmpoffset;
+	cin >> tmpoffset;
+	stringstream tmpStream;
+	tmpStream << "F:/Downloads/mydataset/" << tmpoffset << ".jpg";
+	detect_file = tmpStream.str();
+		
 	while (1) {
 		/* Detect the image */
-		Mat img = imread(image_test_file);
+		Mat img = imread(detect_file);
 		vector<Rect> foundLocations;
 		double hitThreshold = 10.0;
 		cin >> hitThreshold;
@@ -673,4 +681,9 @@ void svm_lbp_detect() {
 		imwrite("Result.jpg", img);
 		destroyAllWindows();
 	}
+}
+
+
+void auto_detect() {
+
 }

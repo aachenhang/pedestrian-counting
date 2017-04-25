@@ -16,3 +16,8 @@
 #include <fstream>
 #include <cstdlib>
 #include <ctime>
+
+
+#include "constants_list.h"
+#include "merge_location.h"
+#include "facedetect.h"
