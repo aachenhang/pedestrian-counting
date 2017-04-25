@@ -74,11 +74,6 @@ static void collect_data_ingrey(Mat &alldatagrey,
 			}
 			resize(img, descriptors, Size(64 * 64, 1));
 			alldatagrey.push_back(descriptors);
-			/* Compute the mirror image *//*
-			Mat imgmirror = imMirror(img);
-			hog.compute(imgmirror, mirrordescriptors);
-			mirrordescriptors.push_back(label);
-			alldescriptors.push_back(mirrordescriptors);*/
 		}
 		else {
 			cout << "miss: " << stream.str() << endl;
@@ -91,41 +86,41 @@ void image_origin_matrix_to_txt() {
 	time_t startTime = time(NULL);
 
 	Mat allData, allDataGrey, allLabel;
-	//
+	
 	///* Collect color data and label */
-	//collect_data(allData, allLabel, positive_samples_file, 1, positive_num);
-	//collect_data(allData, allLabel, negative_samples_file, -1, negative_num);
-	//collect_data(allData, allLabel, positive_hard_samples_file, 1, positive_hard_num);
-	//collect_data(allData, allLabel, negative_hard_samples_file, -1, negative_hard_num);
-
-	///* Collect grey data */
-	//collect_data_ingrey(allDataGrey, positive_samples_file, 1, positive_num);
-	//collect_data_ingrey(allDataGrey, negative_samples_file, -1, negative_num);
-	//collect_data_ingrey(allDataGrey, positive_hard_samples_file, 1, positive_hard_num);
-	//collect_data_ingrey(allDataGrey, negative_hard_samples_file, -1, negative_hard_num);
-
-
-	/* Collect color data and label */
-	collect_data(allData, allLabel, positive_samples_file, 1, 10);
-	collect_data(allData, allLabel, negative_samples_file, -1, 10);
-	collect_data(allData, allLabel, positive_hard_samples_file, 1, 10);
-	collect_data(allData, allLabel, negative_hard_samples_file, -1, 10);
+	collect_data(allData, allLabel, positive_samples_file, 1, positive_num);
+	collect_data(allData, allLabel, negative_samples_file, -1, negative_num);
+	collect_data(allData, allLabel, positive_hard_samples_file, 1, positive_hard_num);
+	collect_data(allData, allLabel, negative_hard_samples_file, -1, negative_hard_num);
 
 	/* Collect grey data */
-	collect_data_ingrey(allDataGrey, positive_samples_file, 1, 10);
-	collect_data_ingrey(allDataGrey, negative_samples_file, -1, 10);
-	collect_data_ingrey(allDataGrey, positive_hard_samples_file, 1, 10);
-	collect_data_ingrey(allDataGrey, negative_hard_samples_file, -1, 10);
+	collect_data_ingrey(allDataGrey, positive_samples_file, 1, positive_num);
+	collect_data_ingrey(allDataGrey, negative_samples_file, -1, negative_num);
+	collect_data_ingrey(allDataGrey, positive_hard_samples_file, 1, positive_hard_num);
+	collect_data_ingrey(allDataGrey, negative_hard_samples_file, -1, negative_hard_num);
+
+
+	///* Collect color data and label */
+	//collect_data(allData, allLabel, positive_samples_file, 1, 10);
+	//collect_data(allData, allLabel, negative_samples_file, -1, 10);
+	//collect_data(allData, allLabel, positive_hard_samples_file, 1, 10);
+	//collect_data(allData, allLabel, negative_hard_samples_file, -1, 10);
+
+	///* Collect grey data */
+	//collect_data_ingrey(allDataGrey, positive_samples_file, 1, 10);
+	//collect_data_ingrey(allDataGrey, negative_samples_file, -1, 10);
+	//collect_data_ingrey(allDataGrey, positive_hard_samples_file, 1, 10);
+	//collect_data_ingrey(allDataGrey, negative_hard_samples_file, -1, 10);
 	
 
 	/* Print the size of data */
-	cout << "allData.size() = " << allData.size() << endl;
+	//cout << "allData.size() = " << allData.size() << endl;
 	cout << "allDataGrey.size() = " << allDataGrey.size() << endl;
 	cout << "allLabel.size() = " << allLabel.size() << endl;
 
 	/* Write the data */
-	FileStorage file(TINY_ALL_IMAGE_FILE, FileStorage::WRITE);
-	file << "allData" << allData;
+	FileStorage file(ALL_IMAGE_FILE, FileStorage::WRITE);
+	//file << "allData" << allData;
 	file << "allDataGrey" << allDataGrey;
 	file << "allLabel" << allLabel;
 

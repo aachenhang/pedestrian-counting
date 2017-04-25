@@ -23,8 +23,8 @@ extern COMMONHEADER_API String ALL_IMAGE_FILE = "H:/Pro/NN_Model/ALL_IMAGE_FILE.
 extern COMMONHEADER_API String TINY_ALL_IMAGE_FILE = "H:/Pro/NN_Model/TINY_ALL_IMAGE_FILE.txt";
 /* convolution neural network model file address */
 extern COMMONHEADER_API String CNN_MODEL_TMP = "H:/Pro/tmp/cnn_model";
-extern COMMONHEADER_API int const positive_num = 2020;
-extern COMMONHEADER_API int const negative_num = 25000;
+extern COMMONHEADER_API int const positive_num = 7000;
+extern COMMONHEADER_API int const negative_num = 21000;
 extern COMMONHEADER_API int const CelebA_num = 202599;
 extern COMMONHEADER_API int const positive_hard_num = 1000;
 extern COMMONHEADER_API int const negative_hard_num = 100;

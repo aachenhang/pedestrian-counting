@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <tchar.h>
 
+#include <Windows.h>
+
 #include "tiny_dnn\tiny_dnn.h"
 
 #include <opencv2\highgui\highgui.hpp>
