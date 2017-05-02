@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <tchar.h>
 
-#include <Windows.h>
 
 #include "tiny_dnn\tiny_dnn.h"
 
@@ -30,6 +29,7 @@
 #include <cstdint>
 
 
-#include "constants_list.h"
+#include <Windows.h>
 
+#include "constants_list.h"
 // TODO: reference additional headers your program requires here

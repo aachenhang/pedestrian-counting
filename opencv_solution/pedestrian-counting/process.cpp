@@ -281,6 +281,7 @@ void hog_svm_cnn_detect() {
 		Mat img = imread(image_test_file);
 		Mat imgGrey = imread(image_test_file, IMREAD_GRAYSCALE);
 		vector<Rect> foundLocations;
+		vector<double> foundWeights;
 		double hitThreshold = 10.0;
 		cout << "cin hitThreshold & finalThreshold" << endl;
 		cin >> hitThreshold;
@@ -291,37 +292,45 @@ void hog_svm_cnn_detect() {
 		double finalThreshold = 100.0;
 		cin >> finalThreshold;
 		bool useMeanshiftGrouping = false;
-		hog.detectMultiScale(img, foundLocations, hitThreshold, winStride, padding, finalThreshold, useMeanshiftGrouping);
+		hog.detectMultiScale(img, foundLocations, foundWeights, hitThreshold, winStride, padding, finalThreshold, useMeanshiftGrouping);
 
 		/* Merge the locations */
-		vector<Rect> res = mergeLocation(foundLocations);
+		//vector<Rect> res = mergeLocation(foundLocations);
 
 		/* Print the locations */
-		sort(res.begin(), res.end(), cmp);
-		for (Rect rect : res) {
-			cout << rect.x << " " << rect.y << endl;
+		//sort(res.begin(), res.end(), cmp);
+		for (int i = 0; i < foundLocations.size(); i++) {
+			cout << foundLocations[i] << " " << foundLocations[i] << " " << foundWeights[i] <<  endl;
 		}
-
 		/* Let CNN verify the result */
 		/* Load the convolution network */
 		network<sequential> nn;
 		nn.load("LeNet-weights");
 		vector<vec_t> predictions;
 		vector<Rect> candidates;
-		for(Rect rect : res){
-			cv::Mat_<uint8_t> resized;
-			vec_t d;
-			Mat tmp = imgGrey(rect);
-			cv::resize(tmp, resized, cv::Size(64, 64));
-			std::transform(resized.begin(), resized.end(), std::back_inserter(d),
-				[=](uint8_t c) { return c * (1.0f - (-1.0f)) / 255.0 + (-1.0f); });
-			predictions.push_back(nn.predict(d));
-			cout << "cout prediction : ";
-			for (double d : nn.predict(d))
-				cout << d << "<<";
-			cout << endl;
-			candidates.push_back(rect);
+		/* convert imagefile to vec_t */
+		vector<Rect> foundResults;
+		vector<Rect> notFoundResults;
 
+		for (int i = 0; i < foundLocations.size(); i++) {
+			if (foundWeights[i] >= 2.0) {
+				foundResults.push_back(foundLocations[i]);
+			}
+			else {
+				Rect rect = foundLocations[i];
+				cv::Mat_<uint8_t> resized;
+				vec_t d;
+				Mat tmp = imgGrey(rect);
+				cv::resize(tmp, resized, cv::Size(64, 64));
+				std::transform(resized.begin(), resized.end(), std::back_inserter(d),
+					[=](uint8_t c) { return c * (1.0f - (-1.0f)) / 255.0 + (-1.0f); });
+				predictions.push_back(nn.predict(d));
+				cout << "cout prediction : ";
+				for (double d : nn.predict(d))
+					cout << d << "<<";
+				cout << endl;
+				candidates.push_back(rect);
+			}
 		}
 		while (1) {
 			double diff = 0, pos = -1, neg = 1;
@@ -344,37 +353,39 @@ void hog_svm_cnn_detect() {
 				cin >> neg;
 			}
 
-			/* convert imagefile to vec_t */
-			vector<Rect> foundLocations;
-			vector<Rect> notFoundLocations;
 
 			for (int i = 0; i < predictions.size(); i++) {
 				vec_t pre = predictions[i];
 				if (pre[1] - pre[0] > diff && pre[1] > pos && pre[0] < neg) {
-					foundLocations.push_back(candidates[i]);
+					foundResults.push_back(candidates[i]);
 				}
 				else {
-					notFoundLocations.push_back(candidates[i]);
+					notFoundResults.push_back(candidates[i]);
 				}
 			}
+
+
+			/* Merge the locations */
+			vector<Rect> res = mergeLocation(foundResults);
+
 			/* Display the rectangle */
 			Scalar GREEN = Scalar(0, 255, 0);
 			Scalar RED = Scalar(32, 85, 234);
-			Mat imgSVM = img;
+			Mat imgSVM = imread(image_test_file);
 			for (int i = 0; i < res.size(); i++) {
 				rectangle(imgSVM, res[i], GREEN, 2);
 			}
-			for (int i = 0; i < foundLocations.size(); i++) {
-				rectangle(img, foundLocations[i], GREEN, 2);
+			for (int i = 0; i < res.size(); i++) {
+				rectangle(img, res[i], GREEN, 2);
 			}
-			for (int i = 0; i < notFoundLocations.size(); i++) {
-				rectangle(img, notFoundLocations[i], RED, 2);
+			for (int i = 0; i < notFoundResults.size(); i++) {
+				rectangle(img, notFoundResults[i], RED, 2);
 			}
 			imshow("SVM", imgSVM);
 			imshow("Result", img);
 			cout << "SVM found:" << res.size() << endl;
-			cout << "CNN found:" << foundLocations.size() << endl;
-			cout << "CNN found Not:" << notFoundLocations.size() << endl;
+			cout << "CNN found:" << foundResults.size() << endl;
+			cout << "CNN found Not:" << notFoundResults.size() << endl;
 			waitKey(0);
 			imwrite("Result.jpg", img);
 			destroyAllWindows();

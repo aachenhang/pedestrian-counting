@@ -87,30 +87,30 @@ void image_origin_matrix_to_txt() {
 
 	Mat allData, allDataGrey, allLabel;
 	
-	///* Collect color data and label */
-	collect_data(allData, allLabel, positive_samples_file, 1, positive_num);
-	collect_data(allData, allLabel, negative_samples_file, -1, negative_num);
+	/* Collect color data and label */
+	collect_data(allData, allLabel, positive_samples_file, 1, 7000);
+	collect_data(allData, allLabel, negative_samples_file, -1, 7000);
 	collect_data(allData, allLabel, positive_hard_samples_file, 1, positive_hard_num);
 	collect_data(allData, allLabel, negative_hard_samples_file, -1, negative_hard_num);
 
 	/* Collect grey data */
-	collect_data_ingrey(allDataGrey, positive_samples_file, 1, positive_num);
-	collect_data_ingrey(allDataGrey, negative_samples_file, -1, negative_num);
+	collect_data_ingrey(allDataGrey, positive_samples_file, 1, 7000);
+	collect_data_ingrey(allDataGrey, negative_samples_file, -1, 7000);
 	collect_data_ingrey(allDataGrey, positive_hard_samples_file, 1, positive_hard_num);
 	collect_data_ingrey(allDataGrey, negative_hard_samples_file, -1, negative_hard_num);
 
 
 	///* Collect color data and label */
-	//collect_data(allData, allLabel, positive_samples_file, 1, 10);
-	//collect_data(allData, allLabel, negative_samples_file, -1, 10);
-	//collect_data(allData, allLabel, positive_hard_samples_file, 1, 10);
-	//collect_data(allData, allLabel, negative_hard_samples_file, -1, 10);
+	//collect_data(allData, allLabel, positive_samples_file, 1, 500);
+	//collect_data(allData, allLabel, negative_samples_file, -1, 500);
+	//collect_data(allData, allLabel, positive_hard_samples_file, 1, 100);
+	//collect_data(allData, allLabel, negative_hard_samples_file, -1, 100);
 
 	///* Collect grey data */
-	//collect_data_ingrey(allDataGrey, positive_samples_file, 1, 10);
-	//collect_data_ingrey(allDataGrey, negative_samples_file, -1, 10);
-	//collect_data_ingrey(allDataGrey, positive_hard_samples_file, 1, 10);
-	//collect_data_ingrey(allDataGrey, negative_hard_samples_file, -1, 10);
+	//collect_data_ingrey(allDataGrey, positive_samples_file, 1, 500);
+	//collect_data_ingrey(allDataGrey, negative_samples_file, -1, 500);
+	//collect_data_ingrey(allDataGrey, positive_hard_samples_file, 1, 100);
+	//collect_data_ingrey(allDataGrey, negative_hard_samples_file, -1, 100);
 	
 
 	/* Print the size of data */
@@ -129,9 +129,61 @@ void image_origin_matrix_to_txt() {
 	cout << "cost " << endTime - startTime << " s" << endl;
 }
 
+
+static void image_origin_matrix_to_tsv() {
+	Mat allDataGrey, allLabel;
+	FileStorage file(ALL_IMAGE_FILE, FileStorage::READ);
+	file["allDataGrey"] >> allDataGrey;
+	file["allLabel"] >> allLabel;
+	cout << "allDataGrey.size() = " << allDataGrey.size() << endl;
+	cout << "allLabel.size() = " << allLabel.size() << endl;
+	file.release();
+
+	/*fstream datafile("H:/Pro/visualize/data.tsv");
+	for (int i = 0; i < allDataGrey.rows; i++) {
+		for (int j = 0; j < allDataGrey.cols - 1; j++) {
+			datafile << static_cast<int>(allDataGrey.at<uint8_t>(i, j)) << "\t";
+		}
+		datafile << static_cast<int>(allDataGrey.at<uint8_t>(i, allDataGrey.cols - 1)) << endl;
+	}
+	datafile.close();*/
+
+	fstream labelfile("H:/Pro/visualize/label.tsv");
+	for (int i = 0; i < allLabel.rows; i++) {
+		labelfile << (allLabel.at<int>(i, 0) == 1 ? 1 : 0) << endl;
+	}
+
+}
+
+
+static void show_matrix_label_distribute() {
+	Mat allDataGrey, allLabel;
+	FileStorage file(TINY_ALL_IMAGE_FILE, FileStorage::READ);
+	file["allDataGrey"] >> allDataGrey;
+	file["allLabel"] >> allLabel;
+	cout << "allDataGrey.size() = " << allDataGrey.size() << endl;
+	cout << "allLabel.size() = " << allLabel.size() << endl;
+	file.release();
+
+	int poscnt = 0, negcnt = 0;
+	for (int i = 0; i < allLabel.rows; i++) {
+	if (allLabel.at<int>(i, 0) == 1) {
+	poscnt++;
+	}
+	else {
+	negcnt++;
+	}
+	}
+	cout << "poscnt = " << poscnt << endl;
+	cout << "negcnt = " << negcnt << endl;
+}
+
+
 int main()
 {
 	image_origin_matrix_to_txt();
+	//image_origin_matrix_to_tsv();
+	//show_matrix_label_distribute();
 	return 0;
 }
 
