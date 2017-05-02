@@ -86,7 +86,7 @@ static void parse_mydataset_test_data_labels(vector<vec_t> &test_data,
 	file["allDataGrey"] >> allDataGrey;
 	file["allLabel"] >> allLabel;
 	file.release();
-	cout << "allData.size() = " << allDataGrey.size() << endl;
+	cout << "allDataGrey.size() = " << allDataGrey.size() << endl;
 	cout << "allLabel.size() = " << allLabel.size() << endl;
 
 	for (int i = 0; i < allDataGrey.rows; i++) {
@@ -166,6 +166,7 @@ int main()
 
 
 	std::cout << "load models..." << std::endl;
+	nn.init_weight();
 	//nn.load(NN_FILE);
 
 	std::cout << "start learning" << std::endl;

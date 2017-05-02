@@ -311,9 +311,11 @@ void hog_svm_cnn_detect() {
 		/* convert imagefile to vec_t */
 		vector<Rect> foundResults;
 		vector<Rect> notFoundResults;
-
+		cout << "cin the weight threshold" << endl;
+		double thre;
+		cin >> thre;
 		for (int i = 0; i < foundLocations.size(); i++) {
-			if (foundWeights[i] >= 2.0) {
+			if (foundWeights[i] >= thre) {
 				foundResults.push_back(foundLocations[i]);
 			}
 			else {
