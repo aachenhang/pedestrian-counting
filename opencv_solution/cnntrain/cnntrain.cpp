@@ -133,6 +133,26 @@ static void generate_test_data(vector<vec_t> &train_data,
 
 int main()
 {
+	/* Construct the neural network */
+	network<sequential> nn;
+	nn << convolutional_layer<tan_h>(64, 64, 3, 1, 1, tiny_dnn::padding::same)
+		<< convolutional_layer<tan_h>(64, 64, 3, 1, 2, tiny_dnn::padding::same)
+		<< average_pooling_layer<tan_h>(64, 64, 2, 2)
+		<< convolutional_layer<tan_h>(32, 32, 3, 2, 2, tiny_dnn::padding::same)
+		<< convolutional_layer<tan_h>(32, 32, 3, 2, 4, tiny_dnn::padding::same)
+		<< average_pooling_layer<tan_h>(32, 32, 4, 2)
+		<< convolutional_layer<tan_h>(16, 16, 3, 4, 4, tiny_dnn::padding::same)
+		<< convolutional_layer<tan_h>(16, 16, 3, 4, 8, tiny_dnn::padding::same)
+		<< average_pooling_layer<tan_h>(16, 16, 8, 2)
+		<< fully_connected_layer<tan_h>(512, 512)
+		<< fully_connected_layer<tan_h>(512, 128)
+		<< fully_connected_layer<tan_h>(128, 2);
+
+
+	std::cout << "init weright..." << std::endl;
+	nn.init_weight();
+	//nn.load(NN_FILE);
+
 	/* Parse mydataset */
 	time_t startTime = time(NULL);
 	vector<vec_t> train_data;
@@ -153,31 +173,16 @@ int main()
 	cout << "test_data[0].size() = " << test_data[0].size() << endl;
 	cout << "test_label.size() = " << test_labels.size() << endl;
 
-	/* Construct the neural network */
-	network<sequential> nn;
-	nn << convolutional_layer<tan_h>(64, 64, 5, 1, 2)
-		<< average_pooling_layer<tan_h>(60, 60, 2, 2)
-		<< convolutional_layer<tan_h>(30, 30, 5, 2, 4)
-		<< average_pooling_layer<tan_h>(26, 26, 4, 2)
-		<< convolutional_layer<tan_h>(13, 13, 5, 4, 8)
-		<< fully_connected_layer<tan_h>(648, 600)
-		<< fully_connected_layer<tan_h>(600, 600)
-		<< fully_connected_layer<tan_h>(600, 2);
-
-
-	std::cout << "load models..." << std::endl;
-	nn.init_weight();
-	//nn.load(NN_FILE);
-
 	std::cout << "start learning" << std::endl;
 
 	timer t;
 	adagrad optimaizer;
-	optimaizer.alpha = 0.0001f;
+	optimaizer.alpha = 0.001f;
 	progress_display disp(train_data.size());
-	int minibatch_size = 20;
+	int minibatch_size = 100;
 	int epoch = 2000;
 	int epochcnt = 0;
+	int best_success = 1340;
 
 	// create callback
 	auto on_enumerate_epoch = [&]() {
@@ -187,6 +192,13 @@ int main()
 
 		nn.save(NN_FILE);
 		cout << "The network was saved at: " << NN_FILE << endl;
+
+		if (res.num_success > best_success) {
+			best_success = res.num_success;
+			cv::String bestNNFileName = NN_FILE + cv::String("_" + to_string(best_success));
+			nn.save(bestNNFileName);
+			cout << "The network was saved at: " << bestNNFileName << endl;
+		}
 
 		char input = myWaitKey(2000);
 		if (input == 'c') {

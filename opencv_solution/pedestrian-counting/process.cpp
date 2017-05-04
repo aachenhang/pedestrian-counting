@@ -244,7 +244,7 @@ void hog_svm_detect() {
 		}
 		imshow("Result", img);
 		waitKey(0);
-		imwrite("Result.jpg", img);
+		imwrite("SVMResult.jpg", img);
 		destroyAllWindows();
 	}
 }
@@ -311,12 +311,13 @@ void hog_svm_cnn_detect() {
 		/* convert imagefile to vec_t */
 		vector<Rect> foundResults;
 		vector<Rect> notFoundResults;
+		vector<Rect> certainLocations;
 		cout << "cin the weight threshold" << endl;
 		double thre;
 		cin >> thre;
 		for (int i = 0; i < foundLocations.size(); i++) {
 			if (foundWeights[i] >= thre) {
-				foundResults.push_back(foundLocations[i]);
+				certainLocations.push_back(foundLocations[i]);
 			}
 			else {
 				Rect rect = foundLocations[i];
@@ -368,28 +369,37 @@ void hog_svm_cnn_detect() {
 
 
 			/* Merge the locations */
-			vector<Rect> res = mergeLocation(foundResults);
+			vector<Rect> cnnRes = mergeLocation(foundResults);
+			vector<Rect> res;
+			for (int i = 0; i < foundResults.size(); i++) {
+				res.push_back(foundResults[i]);
+			}
+			for (int i = 0; i < certainLocations.size(); i++) {
+				res.push_back(certainLocations[i]);
+			}
+			res = mergeLocation(res);
 
 			/* Display the rectangle */
 			Scalar GREEN = Scalar(0, 255, 0);
 			Scalar RED = Scalar(32, 85, 234);
-			Mat imgSVM = imread(image_test_file);
+			Mat finalResImg = imread(image_test_file);
 			for (int i = 0; i < res.size(); i++) {
-				rectangle(imgSVM, res[i], GREEN, 2);
-			}
-			for (int i = 0; i < res.size(); i++) {
-				rectangle(img, res[i], GREEN, 2);
+				rectangle(finalResImg, res[i], GREEN, 2);
 			}
 			for (int i = 0; i < notFoundResults.size(); i++) {
 				rectangle(img, notFoundResults[i], RED, 2);
 			}
-			imshow("SVM", imgSVM);
-			imshow("Result", img);
-			cout << "SVM found:" << res.size() << endl;
+			for (int i = 0; i < cnnRes.size(); i++) {
+				rectangle(img, cnnRes[i], GREEN, 2);
+			}
+			imshow("finalResult", finalResImg);
+			imshow("cnnResult", img);
+			cout << "SVM found:" << foundLocations.size() << endl;
+			cout << "candidate:" << candidates.size() << endl;
 			cout << "CNN found:" << foundResults.size() << endl;
 			cout << "CNN found Not:" << notFoundResults.size() << endl;
 			waitKey(0);
-			imwrite("Result.jpg", img);
+			imwrite("SVM_CNN_Result.jpg", finalResImg);
 			destroyAllWindows();
 		}
 	}
